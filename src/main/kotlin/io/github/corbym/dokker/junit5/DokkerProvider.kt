@@ -1,6 +1,6 @@
-package org.corbym.dokker.junit5
+package io.github.corbym.dokker.junit5
 
-import org.corbym.dokker.DokkerContainer
+import io.github.corbym.dokker.DokkerContainer
 
 interface DokkerProvider : BeforeAllStarter {
     val dokkerContainer: DokkerContainer

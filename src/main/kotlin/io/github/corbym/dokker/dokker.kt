@@ -1,10 +1,10 @@
-package org.corbym.dokker
+package io.github.corbym.dokker
 
 import org.awaitility.Durations
 import org.awaitility.Durations.ONE_SECOND
 import org.awaitility.kotlin.*
-import org.corbym.dokker.DokkerContainer.Companion.runCommand
-import org.corbym.dokker.OptionType.*
+import io.github.corbym.dokker.DokkerContainer.Companion.runCommand
+import io.github.corbym.dokker.OptionType.*
 import java.io.BufferedReader
 import java.time.Duration
 import java.time.Instant.now

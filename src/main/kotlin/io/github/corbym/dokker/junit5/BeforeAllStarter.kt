@@ -1,4 +1,4 @@
-package org.corbym.dokker.junit5
+package io.github.corbym.dokker.junit5
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking

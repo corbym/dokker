@@ -1,9 +1,9 @@
-package org.corbym
+package io.github.corbym
 
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
-import org.corbym.dokker.dokker
+import io.github.corbym.dokker.dokker
 
 class DokkerTest {
     val dokkerContainer = dokker {

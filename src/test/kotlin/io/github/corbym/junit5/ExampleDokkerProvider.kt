@@ -1,8 +1,8 @@
-package org.corbym
+package io.github.corbym.junit5
 
-import org.corbym.dokker.dokker
-import org.corbym.dokker.junit5.BeforeAllStarter.Companion.register
-import org.corbym.dokker.junit5.DokkerProvider
+import io.github.corbym.dokker.dokker
+import io.github.corbym.dokker.junit5.BeforeAllStarter.Companion.register
+import io.github.corbym.dokker.junit5.DokkerProvider
 
 class ExampleDokkerProvider : DokkerProvider {
     override val dokkerContainer = dokker {
