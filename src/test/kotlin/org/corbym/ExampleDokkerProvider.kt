@@ -1,8 +1,8 @@
-package uk.co.binarysoup.junit5
+package org.corbym
 
-import uk.co.binarysoup.dokker.dokker
-import uk.co.binarysoup.dokker.junit5.BeforeAllStarter.Companion.register
-import uk.co.binarysoup.dokker.junit5.DokkerProvider
+import org.corbym.dokker.dokker
+import org.corbym.dokker.junit5.BeforeAllStarter.Companion.register
+import org.corbym.dokker.junit5.DokkerProvider
 
 class ExampleDokkerProvider : DokkerProvider {
     override val dokkerContainer = dokker {

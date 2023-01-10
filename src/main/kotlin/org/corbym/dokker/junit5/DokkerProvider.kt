@@ -1,6 +1,6 @@
-package uk.co.binarysoup.dokker.junit5
+package org.corbym.dokker.junit5
 
-import uk.co.binarysoup.dokker.DokkerContainer
+import org.corbym.dokker.DokkerContainer
 
 interface DokkerProvider : BeforeAllStarter {
     val dokkerContainer: DokkerContainer

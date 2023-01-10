@@ -1,10 +1,10 @@
-package uk.co.binarysoup.dokker
+package org.corbym.dokker
 
 import org.awaitility.Durations
 import org.awaitility.Durations.ONE_SECOND
 import org.awaitility.kotlin.*
-import uk.co.binarysoup.dokker.DokkerContainer.Companion.runCommand
-import uk.co.binarysoup.dokker.OptionType.*
+import org.corbym.dokker.DokkerContainer.Companion.runCommand
+import org.corbym.dokker.OptionType.*
 import java.io.BufferedReader
 import java.time.Duration
 import java.time.Instant.now

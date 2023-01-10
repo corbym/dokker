@@ -1,9 +1,9 @@
-package uk.co.binarysoup
+package org.corbym
 
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
-import uk.co.binarysoup.dokker.dokker
+import org.corbym.dokker.dokker
 
 class DokkerTest {
     val dokkerContainer = dokker {

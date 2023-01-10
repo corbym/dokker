@@ -1,4 +1,4 @@
-package uk.co.binarysoup.junit5
+package org.corbym
 
 import org.awaitility.Durations
 import org.awaitility.kotlin.atMost
@@ -6,8 +6,8 @@ import org.awaitility.kotlin.await
 import org.awaitility.kotlin.until
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import uk.co.binarysoup.dokker.DokkerContainer.Companion.runCommand
-import uk.co.binarysoup.dokker.junit5.BeforeAllStarter
+import org.corbym.dokker.DokkerContainer.Companion.runCommand
+import org.corbym.dokker.junit5.BeforeAllStarter
 import kotlin.test.assertTrue
 
 @ExtendWith(ExampleDokkerProvider::class)
