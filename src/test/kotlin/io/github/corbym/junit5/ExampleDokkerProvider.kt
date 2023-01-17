@@ -8,12 +8,13 @@ class ExampleDokkerProvider : DokkerProvider {
     override val dokkerContainer = dokker {
         name("couchbase")
         detach()
+        debug()
         expose("8091")
         image { "arungupta/couchbase" }
         version { "latest" }
     }
 
     init {
-        register(dokkerContainer.dockerCommand.name, dokkerContainer.hasStarted())
+        register(dokkerContainer.name, dokkerContainer.hasStarted())
     }
 }

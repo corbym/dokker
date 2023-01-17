@@ -2,21 +2,20 @@ os: linux
 dist: trusty
 language: java
 install: skip
-
 jdk:
-  - openjdk11
-
+- openjdk11
 script:
-  - ./gradlew build
-  - ./gradlew check
-  - ./gradlew jar
-  - ./gradlew publish
-
+- "./gradlew build"
+- "./gradlew check"
+- "./gradlew jar"
+- "./gradlew publish"
 before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+env:
+  global:
+    secure: cLj5SFDtyNGm279zMCzsxTQI7HKMM/8Wzbf2qdGg3cKgpUhUkmV0UYO1/9TqokQ5V71vx4RnedDtW/AIfUrK9Avz02gssBxMsvExNsxIMyeJm9hT4yb8ur7eths8JZbET1zMapOI1gwV0lUWlYA6V6O3vs1/5qHXpQFqZS6JRlVO9mXOJd+YRff2BHwNkRtLOlIRk5g/Ep+MuyZgtlzZ5uz/mTyFREb4NcKTtAMBM4ViNzg+Y9qvnvEr16kb6lPRu6tIKWQMmjLc2N+YQs1n6C06mkYu5UMP3axem9OzHTM/AvRe/OahgMzfNJuPeknF8vlnVGZ5H3OmQCNF1WzIXan1aShsAprSEbzDxVStLqpr6vJcaaf2vJQA/RyjxlaDENTBiYbdal+MEIR43osS0h+FblYLW548ygZFpfgb4ywX6+1kygfR8xhJ5sClD8e+N2/V743vHvwVbOS1IuWG05KIl4+nxm0F6/wHaLEwKkr9Ek/LDjrng7q36XdGgUx3O7ZuzcYWeR3etQ+gVlQPxYmmxnnael8ywZvsy06FmfXA9IHaYnNLUETCJlG8z/F3qWXdgTUr4sQqIRMQnP0BWFYC7wvhhlSOr25iA8m8nhfTmBWH2GEE4Ctm+LLf+sg7zfvwaGccgPT+lzdCkulKIuIiZYzq7Dys8K+G5HHYUoI=

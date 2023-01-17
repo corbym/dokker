@@ -10,12 +10,12 @@ import java.time.Duration
 import java.time.Instant.now
 import java.util.*
 
-fun dokker(init: DockerContainerBuilder.() -> Unit): DokkerContainer {
-    return DockerContainerBuilder().apply(init).build()
+fun dokker(init: DokkerContainerBuilder.() -> Unit): DokkerContainer {
+    return DokkerContainerBuilder().apply(init).build()
 }
 
 @Suppress("unused")
-class DockerContainerBuilder {
+class DokkerContainerBuilder {
     private var onStart: (DokkerContainer, String) -> Unit = { _, _ -> }
     private var name: String = "dockerContainer-${UUID.randomUUID()}"
     private val networks: MutableList<String> = mutableListOf()
@@ -105,8 +105,8 @@ class DockerContainerBuilder {
 
     fun build(): DokkerContainer {
         return DokkerContainer(
-            DockerCommand(
-                name = name,
+            DokkerRunCommand(
+                containerName = name,
                 networks = networks,
                 expose = expose,
                 env = env,
@@ -197,8 +197,8 @@ enum class OptionType(val option: String) {
     INTERACTIVE("i")
 }
 
-class DockerCommand(
-    val name: String,
+class DokkerRunCommand(
+    val containerName: String,
     val networks: List<String>,
     var expose: List<String>,
     var env: List<String>,
@@ -241,7 +241,7 @@ class DockerCommand(
     private fun buildExpose(): List<String> = expose.map { "--expose $it" }
     private fun buildEnv(): List<String> = env.map { "--env $it" }
 
-    private fun buildName(): List<String> = listOf("--name $name")
+    private fun buildName(): List<String> = listOf("--name $containerName")
 
     private fun buildNetworks(): List<String> = networks.map { "--network $it" }
 
@@ -260,7 +260,7 @@ class DockerCommand(
 
 private fun String?.prefix(prefix: String): String = "$prefix$this"
 
-interface DockerLifecycle {
+interface DokkerLifecycle {
     val name: String
     fun start()
     fun stop()
@@ -269,16 +269,16 @@ interface DockerLifecycle {
 }
 
 class DokkerContainer(
-    val dockerCommand: DockerCommand,
+    val dokkerRunCommand: DokkerRunCommand,
     val healthCheck: HealthCheck?,
     var onStart: (dokker: DokkerContainer, runResponse: String) -> Unit = { _, _ -> },
-) : DockerLifecycle {
-    override val name = dockerCommand.name
+) : DokkerLifecycle {
+    override val name = dokkerRunCommand.containerName
     override fun start() {
         if (!hasStarted()) {
             debug("starting docker container $name")
             checkContainerStopped()
-            onStart(this, dockerCommand.buildRunCommand().runCommand())
+            onStart(this, dokkerRunCommand.buildRunCommand().runCommand())
         }
     }
 
@@ -361,7 +361,7 @@ class DokkerContainer(
     }
 }
 
-class DockerNetwork(private val networkName: String) : DockerLifecycle {
+class DokkerNetwork(private val networkName: String) : DokkerLifecycle {
     override val name = networkName
     override fun start() {
         if (!hasStarted())
