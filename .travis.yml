@@ -3,7 +3,7 @@ dist: trusty
 language: java
 install: skip
 jdk:
-- openjdk11
+- openjdk17
 script:
 - "./gradlew build"
 - "./gradlew check"
