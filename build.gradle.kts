@@ -42,8 +42,8 @@ publishing {
         }
     }
 }
-if (System.getenv()["env.global.secure"] != null) {
-    val sonatypePassword = System.getenv()["env.global.secure"]
+if (System.getenv()["OSSRH_PASSWORD"] != null) {
+    val sonatypePassword = System.getenv()["OSSRH_PASSWORD"]
     nexusPublishing {
         repositories {
             sonatype {
