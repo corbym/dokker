@@ -5,8 +5,7 @@ install: skip
 jdk:
 - openjdk17
 script:
-- "./gradlew build"
-- "./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository"
+- "./gradlew build publishToSonatype closeAndReleaseSonatypeStagingRepository"
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
