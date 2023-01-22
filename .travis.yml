@@ -6,7 +6,7 @@ jdk:
 - openjdk17
 script:
 - "gpg --import .travis/private.pgp"
-- "gpg --import .travis/gpg.asc"
+- "gpg --batch --import .travis/gpg.asc"
 - "./gradlew build"
 - "./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository"
 before_cache:
