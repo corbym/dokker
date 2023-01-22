@@ -41,10 +41,17 @@ publishing {
             pom {
                 groupId = project.group.toString()
                 artifactId = project.name
+                name.set(project.name)
                 version = project.version.toString()
                 description.set("dokker - a kotlin docker library")
                 url.set("https://github.com/corbym/dokker")
 
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("http://www.opensource.org/licenses/mit-license.php")
+                    }
+                }
                 developers {
                     developer {
                         id.set("corbymatt")
