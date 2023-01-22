@@ -38,6 +38,26 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
+            pom {
+                groupId = project.group.toString()
+                artifactId = project.name
+                version = project.version.toString()
+                description.set("dokker - a kotlin docker library")
+                url.set("https://github.com/corbym/dokker")
+
+                developers {
+                    developer {
+                        id.set("corbymatt")
+                        name.set("Matt Corby-Eaglen")
+                        email.set("matt.corby@gmail.com")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git@github.com:corbym/dokker.git")
+                    url.set("https://github.com/corbym/dokker")
+                }
+
+            }
         }
     }
 }
