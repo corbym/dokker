@@ -68,9 +68,8 @@ publishing {
         }
     }
     signing {
-        project.extra["signing.gnupg.passphrase"] = System.getenv()["GNUPG_PASSPHRASE"]
         val signingKey = File(".travis/secret.asc.gpg").readText()
-        val signingPassword = System.getenv()["GPG_SIGNING_PASSWORD"]
+        val signingPassword = System.getenv()["GNUPG_PASSPHRASE"]
 
         useInMemoryPgpKeys(signingKey, signingPassword)
         sign(configurations.archives.get())
