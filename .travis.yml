@@ -6,8 +6,8 @@ jdk:
 - openjdk17
 script:
 - "./gradlew build"
-- "./gradlew publish"
-- "./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository"
+- "./gradlew -d--full-stacktrace publish --full-stacktrace"
+- "./gradlew -d--full-stacktrace publishToSonatype closeAndReleaseSonatypeStagingRepository"
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
