@@ -27,3 +27,4 @@ hs_err_pid*
 build
 /gpg.asc
 /private.pgp
+/secret.asc.gpg
