@@ -5,6 +5,7 @@ install: skip
 jdk:
 - openjdk17
 script:
+- "gpg --import .travis/gpg.asc"
 - "./gradlew build"
 - "./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository"
 before_cache:
