@@ -5,6 +5,8 @@ install: skip
 jdk:
 - openjdk17
 script:
+- "gpg --import .travis/private.pgp"
+- "gpg --import .travis/gpg.asc"
 - "./gradlew build"
 - "./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository"
 before_cache:
@@ -21,3 +23,5 @@ env:
 before_install:
 - openssl aes-256-cbc -K $encrypted_d441efe2d5f7_key -iv $encrypted_d441efe2d5f7_iv
   -in .travis/private.pgp.enc -out .travis/private.pgp -d
+- openssl aes-256-cbc -K $encrypted_4f0d00631887_key -iv $encrypted_4f0d00631887_iv
+  -in .travis/gpg.asc.enc -out .travis/gpg.asc -d
