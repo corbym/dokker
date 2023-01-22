@@ -69,7 +69,10 @@ publishing {
         }
     }
     signing {
-        useGpgCmd()
+        useInMemoryPgpKeys(
+            findProperty("signingKey").toString(),
+            findProperty("signingPassword").toString()
+        )
         sign(configurations.archives.get())
     }
 }
