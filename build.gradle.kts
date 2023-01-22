@@ -1,5 +1,4 @@
 group = "io.github.corbym"
-version = 0.0
 
 plugins {
     kotlin("jvm") version "1.8.0"
@@ -42,8 +41,14 @@ publishing {
         }
     }
 }
+travisVersioner {
+    major = 0
+    minor = 0
+    qualifiedBranch = "release"
+}
 if (System.getenv()["OSSRH_PASSWORD"] != null) {
     val sonatypePassword = System.getenv()["OSSRH_PASSWORD"]
+
     nexusPublishing {
         repositories {
             sonatype {
