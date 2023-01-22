@@ -1,5 +1,4 @@
 group = "io.github.corbym"
-
 plugins {
     kotlin("jvm") version "1.8.0"
     `maven-publish`
@@ -69,10 +68,8 @@ publishing {
         }
     }
     signing {
-        useInMemoryPgpKeys(
-            findProperty("signingKey").toString(),
-            findProperty("signingPassword").toString()
-        )
+        project.extra["signing.gnupg.passphrase"] = System.getenv()["GNUPG_PASSPHRASE"]
+        useGpgCmd()
         sign(configurations.archives.get())
     }
 }
