@@ -5,8 +5,6 @@ install: skip
 jdk:
 - openjdk17
 script:
-- "gpg --import .travis/private.pgp"
-- "gpg --batch --import .travis/gpg.asc"
 - "./gradlew build"
 - "./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository"
 before_cache:
@@ -21,7 +19,5 @@ env:
   - secure: mY2FTDVCkMp60Ot7aAnsRcntHZJndXMsXAsXVriUcintwMcvb9tmEs734BaXkEdgGiOG+5GhvkOTbElvSqR9IG8JOFYZTWwSwDAGVKa+VKwZbAFwxB+Kvt63AxBS73OK6hKfP2qEoLweWKyfJYZjGYKXTsELFfeuvfIwymrjoYK3w1Ud6pFLfPDMlZllme+VHJMeuHXOSRF1OymSNEd4NUCiG2xYxtLLFe74op0FgAye+g0v0Z5Fu1aywFF9G1DjdC6GARYJ8UMFxRqBu2kKStWhqOFg84YDXwoYxaAUcSpYh9ah8uJ0LhopKMDPe8aJOxQgGJU8m9TIoi6OYW/FSZbIgfKRPY/FxN8dgheI6fvogZQ/s9TjiU4Mk4Cmj6tCHgOxaUXLPsWHb/G3ohloWxUiDSZx96koowHBbTFB98SGu5NymttFb5Hmy3wIq46yhiH/mfK8Ph2ULgqmxApm9XiB3geLj1lGx6/4lSe+9hHFAxnT79cZ2gPU062PlcN/eA0gc/FP7KNvwjkEEDC1NmbI3ZQSo9k33TH6uftSTxYXKs54zBK0BPhHmMbz1ilJfnc0MtiuqmTwb92bnkVG6L/j5pRtNKUkTvud4RbRT1DLQ8/lYXNOxBQVntC0OVM+Nis39tLjKdnNJOu1VF7355GIXgIW4bqIzspQco43dgo=
   - secure: SfVD5eYE1JH/4E+4rvorzmrJ5i2CjUCvPeVlKjHjmXfegyn0P4HKLSbPpJxjJ0TS4I+VtxiYt2SB74bxaTUen5e/j964C8QJEJhyCBgx32hOTs1OXP/mLg5VE0OCbc4LXnZ6yi7USdVK73OVyEiLYY1xLfDE9kUSQ04VlGDSYyb2WtbhjXqLakzM1r2Tl/nZaLNKparHQ69DgN3RG0psb6wnEZ9O+FPqJhUv7kVsTVgg23/RNsXu/gHCZdQYisntC7H0Lq8srUhg5i7QjN3hvUtxLlDcyOBgvDpcvhprTUHqeXbtdOdlOZCRZD5WEAGG4KIBvZ21zWgQ6uUQIqnxOTguPDeZp4DTltALFlXV2dhbYVBMDcIZP0cJqmXifowV8RFEcyX2JYFGaz87VvlrESWyGTLFKqjgoeFN5dRIfoGork92jLDQyQXLzjPlGTQQ3XxldECKx647xmyQp5bvvmSn5krrv+r0nL/ZxwGxIFyYtYGkZc2HdpbmMdaz6ENU4QanydSwvD5xU6LxLV7ozNrG2jYt7YoIKDbjDze1z6luwQ6HGPawUGNyQ4F38eYLaWwqQ1MusvOAscU9xAgIrGjONUQUOvl4PKmM6hmtdUSbijDsE++i8HAaHbHliP4pHEE811lUDsgt4aB5yPOABj1zdb0hHdTOBu9rs6JYZGc=
 before_install:
-- openssl aes-256-cbc -K $encrypted_d441efe2d5f7_key -iv $encrypted_d441efe2d5f7_iv
+- openssl aes-256-cbc -K $encrypted_49bdff7a5c9f_key -iv $encrypted_49bdff7a5c9f_iv
   -in .travis/private.pgp.enc -out .travis/private.pgp -d
-- openssl aes-256-cbc -K $encrypted_4f0d00631887_key -iv $encrypted_4f0d00631887_iv
-  -in .travis/gpg.asc.enc -out .travis/gpg.asc -d
