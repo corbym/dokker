@@ -1,16 +1,24 @@
 group = "io.github.corbym"
-version = 0.0
+version = "0.0.1"
 
 plugins {
     kotlin("jvm") version "1.8.0"
     `maven-publish`
+    id("com.dipien.semantic-version") version "2.0.0" apply false
 }
+
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
     withJavadocJar()
     withSourcesJar()
 }
+
+tasks.create("applySemanticVersionPlugin"){
+    dependsOn("prepareKotlinBuildScriptModel")
+    apply(plugin="com.dipien.semantic-version")
+}
+
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions {
         jvmTarget = "11"
