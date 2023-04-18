@@ -25,3 +25,6 @@ hs_err_pid*
 .gradle
 .idea
 build
+/gpg.asc
+/private.pgp
+/secret.asc.gpg

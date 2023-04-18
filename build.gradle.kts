@@ -1,10 +1,9 @@
 group = "io.github.corbym"
+version = 0.0
 
 plugins {
     kotlin("jvm") version "1.8.0"
     `maven-publish`
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
-    id("com.bnc.gradle.travis-ci-versioner") version "1.1.0"
 }
 java {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -36,27 +35,19 @@ repositories {
 
 publishing {
     publications {
-        create<MavenPublication>("mavenJava") {
+        register<MavenPublication>("gpr") {
             from(components["java"])
         }
     }
-}
-travisVersioner {
-    major = 0
-    minor = 0
-    qualifiedBranch = "release"
-}
-if (System.getenv()["OSSRH_PASSWORD"] != null) {
-    val sonatypePassword = System.getenv()["OSSRH_PASSWORD"]
-
-    nexusPublishing {
-        repositories {
-            sonatype {
-                nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-                snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-                username.set("corbymatt") // defaults to project.properties["myNexusUsername"]
-                password.set(sonatypePassword) // defaults to project.properties["myNexusPassword"]
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
             }
         }
     }
 }
+
