@@ -1,10 +1,9 @@
 group = "io.github.corbym"
+version = 0.0
+
 plugins {
     kotlin("jvm") version "1.8.0"
     `maven-publish`
-    signing
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
-    id("com.bnc.gradle.travis-ci-versioner") version "1.1.0"
 }
 java {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -36,61 +35,19 @@ repositories {
 
 publishing {
     publications {
-        create<MavenPublication>("mavenJava") {
+        register<MavenPublication>("gpr") {
             from(components["java"])
-            pom {
-                groupId = project.group.toString()
-                artifactId = project.name
-                name.set(project.name)
-                version = project.version.toString()
-                description.set("dokker - a kotlin docker library")
-                url.set("https://github.com/corbym/dokker")
-
-                licenses {
-                    license {
-                        name.set("MIT License")
-                        url.set("http://www.opensource.org/licenses/mit-license.php")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("corbymatt")
-                        name.set("Matt Corby-Eaglen")
-                        email.set("matt.corby@gmail.com")
-                    }
-                }
-                scm {
-                    connection.set("scm:git:git@github.com:corbym/dokker.git")
-                    url.set("https://github.com/corbym/dokker")
-                }
-
-            }
         }
     }
-    signing {
-        val signingKey = File(".travis/secret.asc.gpg").readText()
-        val signingPassword = System.getenv()["GNUPG_PASSPHRASE"]
-
-        useInMemoryPgpKeys(signingKey, signingPassword)
-        sign(configurations.archives.get())
-    }
-}
-travisVersioner {
-    major = 0
-    minor = 0
-    qualifiedBranch = "release"
-}
-if (System.getenv()["OSSRH_PASSWORD"] != null) {
-    val sonatypePassword = System.getenv()["OSSRH_PASSWORD"]
-
-    nexusPublishing {
-        repositories {
-            sonatype {
-                nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-                snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-                username.set("corbymatt")
-                password.set(sonatypePassword)
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
             }
         }
     }
 }
+
