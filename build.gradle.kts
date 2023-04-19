@@ -1,5 +1,6 @@
 group = "io.github.corbym"
 version = "0.0.1"
+description = "dokker: Simple Kotlin docker builder for tests."
 
 plugins {
     kotlin("jvm") version "1.8.0"
@@ -55,9 +56,33 @@ repositories {
 }
 
 publishing {
-    publications {
-        register<MavenPublication>("gpr") {
-            from(components["java"])
+    publishing {
+        publications {
+            create<MavenPublication>("mavenJava") {
+                pom {
+                    name.set(project.name)
+                    description.set(project.description)
+                    url.set("https://github.com/corbym/dokker")
+                    licenses {
+                        license {
+                            name.set("MIT License")
+                            url.set("https://github.com/corbym/dokker/blob/main/LICENSE")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set("corbym")
+                            name.set("Matt Corby-Eaglen")
+                            email.set("matt.corby@gmail.com")
+                        }
+                    }
+                    scm {
+                        connection.set("scm:git:git@github.com:corbym/dokker.git")
+                        developerConnection.set("scm:git:ssh://github.com:corbym/dokker.git")
+                        url.set("https://github.com/corbym/dokker")
+                    }
+                }
+            }
         }
     }
     repositories {
