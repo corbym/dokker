@@ -14,7 +14,7 @@ signing {
     useInMemoryPgpKeys(signingKey, signingPassword)
 
     setRequired({
-        (project.extra["isReleaseVersion"] as Boolean) && gradle.taskGraph.hasTask("publish")
+        gradle.taskGraph.hasTask("publish")
     })
     sign(publishing.publications["main"])
 }
