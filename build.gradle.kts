@@ -18,7 +18,7 @@ signing {
     setRequired({
         gradle.taskGraph.hasTask("publish")
     })
-    sign(publishing.publications["mavenJava"])
+    sign(publishing.publications)
 }
 
 java {
@@ -98,7 +98,9 @@ publishing {
     repositories {
         maven {
             name = "OSSRH"
-            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/service/local/snapshot/deploy/maven2/")
+            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
             credentials {
                 username = System.getenv("MAVEN_USERNAME")
                 password = System.getenv("MAVEN_PASSWORD")
