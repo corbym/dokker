@@ -9,9 +9,10 @@ plugins {
 }
 
 signing {
-    val signingKey: String? by project
-    val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
+    useInMemoryPgpKeys(
+        System.getenv("ORG_GRADLE_PROJECT_signingKey"),
+        System.getenv("ORG_GRADLE_PROJECT_signingPassword")
+    )
 
     setRequired({
         gradle.taskGraph.hasTask("publish")
