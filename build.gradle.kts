@@ -18,7 +18,7 @@ signing {
     setRequired({
         gradle.taskGraph.hasTask("publish")
     })
-    sign(publishing.publications)
+    sign(publishing.publications["mavenJava"])
 }
 
 java {
