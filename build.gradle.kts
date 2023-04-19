@@ -5,6 +5,14 @@ plugins {
     kotlin("jvm") version "1.8.0"
     `maven-publish`
     id("com.dipien.semantic-version") version "2.0.0" apply false
+    signing
+}
+
+signing {
+    val signingKey: String? by project
+    val signingPassword: String? by project
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign(publishing.publications["gpr"])
 }
 
 java {
@@ -14,9 +22,9 @@ java {
     withSourcesJar()
 }
 
-tasks.create("applySemanticVersionPlugin"){
+tasks.create("applySemanticVersionPlugin") {
     dependsOn("prepareKotlinBuildScriptModel")
-    apply(plugin="com.dipien.semantic-version")
+    apply(plugin = "com.dipien.semantic-version")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
