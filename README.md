@@ -69,7 +69,7 @@ The builder reflects most of the commands you can execute on the command line, i
 # Junit Extension
 You can extend a test with the junit5 `@ExtendWith` annotation and create your own `DokkerProvider`.
 
-See [ExampleDokkerProvider.kt](src/test/kotlin/uk/co/binarysoup/junit5/ExampleDokkerProvider.kt) for more details.
+See [ExampleDokkerProvider.kt](src/test/kotlin/io/github/corbym/junit5/ExampleDokkerProvider.kt) for more details.
 
 ## Lifecycle
 
