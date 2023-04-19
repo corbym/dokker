@@ -59,6 +59,16 @@ publishing {
     publishing {
         publications {
             create<MavenPublication>("mavenJava") {
+                artifactId = "dokker"
+                from(components["java"])
+                versionMapping {
+                    usage("java-api") {
+                        fromResolutionOf("runtimeClasspath")
+                    }
+                    usage("java-runtime") {
+                        fromResolutionResult()
+                    }
+                }
                 pom {
                     name.set(project.name)
                     description.set(project.description)
