@@ -22,12 +22,13 @@ Dokker is distributed through Maven Central.
 
   <type>module</type>
 
+  <scope>test</scope>
 </dependency>
 ```
 ### Gradle
 ```
 dependencies {
-implementation("io.github.corbym:dokker:0.0.1")
+testImplementation("io.github.corbym:dokker:0.0.1")
 }
 ```
 ## The kotlin dokker builder
