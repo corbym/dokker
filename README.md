@@ -6,6 +6,30 @@ You must have docker command line installed on your system before any of this wi
 
 https://docs.docker.com/get-docker/
 
+## Installation 
+
+Dokker is distributed through Maven Central.
+
+### Maven
+```
+<dependency>
+
+  <groupId>io.github.corbym</groupId>
+
+  <artifactId>dokker</artifactId>
+
+  <version>0.0.1</version>
+
+  <type>module</type>
+
+</dependency>
+```
+### Gradle
+```
+dependencies {
+implementation("io.github.corbym:dokker:0.0.1")
+}
+```
 ## The kotlin dokker builder
 
 The dokker builder builds a docker command line and executes it via `java.lang.ProcessBuilder` created process.
