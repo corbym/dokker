@@ -39,7 +39,7 @@ e.g:
 val myContainer = dokker {
     name("my-container")
     detach()
-    pollingInterval(TEN_SECONDS)
+
     expose("9092", "29092", "9101")
     image { "my/container" }
     version { "1.1" }
@@ -49,6 +49,7 @@ val myContainer = dokker {
       "MY_CONFIG_PROP" to "hello"
     )
     healthCheck {
+        pollingInterval(TEN_SECONDS)
       checking { "curl -i --fail http://localhost:8080/health?ready=1" to "HTTP/1.1 200 OK" }
     }
     execOnStartup { it: DockerContainer ->
