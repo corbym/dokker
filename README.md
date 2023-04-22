@@ -53,7 +53,7 @@ val myContainer = dokker {
         pollingInterval(TEN_SECONDS)
       checking { "curl -i --fail http://localhost:8080/health?ready=1" to "HTTP/1.1 200 OK" }
     }
-    execOnStartup { it: DockerContainer ->
+    onStartup { it: DockerContainer ->
       .. commands to run on docker etc..
       it.executeHealthCheck()
     }
@@ -130,7 +130,7 @@ The framework will attempt to run the container with `docker run`.
 After the container has been run, any executions you specify are performed. You can specify this with
 
 ```kotlin
-execOnStartup {
+onStartup {
     it.waitForHealthCheck()
 }
 ```
