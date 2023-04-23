@@ -69,11 +69,12 @@ e.g:
 "docker ps".runCommand()`
 ```
 ## Execute Health Check
-Executes the health check given in the configuration with an initial delay and polling interval. E.g.
+Executes the health check given in the configuration with an initial delay, timeout and polling interval. E.g.
 
 ```kotlin
 val dockerContainer = dokker {
   healthCheck {
+      timeout(Duration.ofSeconds(30))
       pollingInterval(TEN_SECONDS)
       initialDelay(TEN_SECONDS)
       checking { "curl -i --fail http://localhost:8080/health?ready=1" to "HTTP/1.1 200 OK" }
