@@ -13,22 +13,17 @@ Dokker is distributed through Maven Central.
 ### Maven
 ```
 <dependency>
-
   <groupId>io.github.corbym</groupId>
-
   <artifactId>dokker</artifactId>
-
   <version>0.0.1</version>
-
   <type>module</type>
-
   <scope>test</scope>
 </dependency>
 ```
 ### Gradle
 ```
 dependencies {
-testImplementation("io.github.corbym:dokker:0.0.1")
+  testImplementation("io.github.corbym:dokker:0.0.1")
 }
 ```
 ## The kotlin dokker builder
@@ -92,6 +87,20 @@ The builder reflects most of the commands you can execute on the command line, i
 * stop
 * exec
 * execWithSpacedParameter - this allows you to pass ProcessBuilder a command parameter which may contain spaces, and is a workaround really.  
+
+# DokkerLifecycle 
+
+Every `DokkerContainer` implements the `DokkerLifecycle` interface. There is a special object for a network called `DokkerNetwork`, it too implements the `DokkerLifecycle` interface:
+
+```kotlin
+interface DokkerLifecycle {
+    val name: String
+    fun start()
+    fun stop()
+    fun remove()
+    fun hasStarted(): Boolean
+}
+```
 
 # Junit5 Extension
 You can extend a test with the junit5 `@ExtendWith` annotation and create your own `DokkerProvider`.
