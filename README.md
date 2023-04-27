@@ -74,6 +74,17 @@ e.g:
 ```
 "docker ps".runCommand()`
 ```
+## Access the command that was run
+
+You can get the parameters that were used to run the docker command using `dockerContainer.dokkerRunCommand`, e.g:
+```
+val containerPublishedPorts = myContainer.dokkerRunCommand.publishedPorts
+val exposedPorts = myContainer.dokkerRunCommand.expose
+val image = myContainer.dokkerRunCommand.image
+
+.. etc ..
+```
+
 ## Execute Health Check
 Executes the health check given in the configuration with an initial delay, timeout and polling interval. E.g.
 
