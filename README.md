@@ -123,7 +123,7 @@ val myNetwork = DokkerNetwork("some-network").also { it.start() }
 
 # DokkerLifecycle 
 
-Every [`DokkerContainer`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/dokker.kt#L271:~:text=271-,class%20DokkerContainer(,-274)) and [`DokkerNetwork`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/dokker.kt#L271:~:text=364-,class%20DokkerNetwork(private%20val%20networkName%3A%20String)%20%3A%20DokkerLifecycle%20%7B,-Search%20for%20this)` implements the [`DokkerLifecycle`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/dokker.kt#L263:~:text=263-,interface%20DokkerLifecycle%20%7B,-275) interface:
+Every [`DokkerContainer`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/dokker.kt#L271:~:text=271-,class%20DokkerContainer(,-274)) and [`DokkerNetwork`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/dokker.kt#L271:~:text=364-,class%20DokkerNetwork(private%20val%20networkName%3A%20String)%20%3A%20DokkerLifecycle%20%7B,-Search%20for%20this) implements the [`DokkerLifecycle`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/dokker.kt#L263:~:text=263-,interface%20DokkerLifecycle%20%7B,-275) interface:
 
 ```kotlin
 interface DokkerLifecycle {
