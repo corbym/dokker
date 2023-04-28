@@ -173,7 +173,7 @@ The framework will attempt to run the container with `docker run`.
 After the container has been run, any executions you specify are performed. You can specify this with
 
 ```kotlin
-onStartup {
+onStartup { container, _ ->
     it.waitForHealthCheck()
 }
 ```
