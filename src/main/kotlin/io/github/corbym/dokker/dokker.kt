@@ -1,13 +1,9 @@
 package io.github.corbym.dokker
 
-import org.awaitility.Durations
+import io.github.corbym.dokker.OptionType.DETACH
+import io.github.corbym.dokker.OptionType.INTERACTIVE
 import org.awaitility.Durations.ONE_SECOND
-import org.awaitility.kotlin.*
-import io.github.corbym.dokker.DokkerContainer.Companion.runCommand
-import io.github.corbym.dokker.OptionType.*
-import java.io.BufferedReader
 import java.time.Duration
-import java.time.Instant.now
 import java.util.*
 
 fun dokker(init: DokkerContainerBuilder.() -> Unit): DokkerContainer {
@@ -105,8 +101,8 @@ class DokkerContainerBuilder {
 
     fun build(): DokkerContainer {
         return DokkerContainer(
-            DokkerRunCommand(
-                containerName = name,
+            DokkerRunCommandBuilder(
+                name = name,
                 networks = networks,
                 expose = expose,
                 env = env,
@@ -188,195 +184,4 @@ class HealthCheckBuilder {
             healthCheck ?: error("nothing specified to check in healthCheck")
         )
     }
-}
-
-data class Option(val type: OptionType, val enabled: Boolean)
-
-enum class OptionType(val option: String) {
-    DETACH("d"),
-    INTERACTIVE("i")
-}
-
-class DokkerRunCommand(
-    val containerName: String,
-    val networks: List<String>,
-    var expose: List<String>,
-    var env: List<String>,
-    var publishedPorts: List<String>,
-    var image: String,
-    var version: String? = null,
-    var command: String? = null,
-    var memory: String? = null,
-    var hostname: String? = null,
-    var user: String? = null,
-    vararg val options: Option,
-) {
-    fun buildRunCommand(): String = "docker run${buildOptions()} ${buildImage()}${command?.prefix(" ") ?: ""}"
-    private fun buildOptions() = listOf(
-        listOf(buildFlags()),
-        buildName(),
-        buildExpose(),
-        buildPorts(),
-        buildEnv(),
-        buildNetworks(),
-        buildMemoryLimit(),
-        buildHostName(),
-        buildUser(),
-    ).flatten()
-        .filter { it.isNotEmpty() }
-        .joinToString(separator = " ", prefix = " ")
-
-    private fun buildMemoryLimit(): List<String> =
-        if (memory != null)
-            listOf("--memory $memory")
-        else emptyList()
-
-    private fun buildHostName(): List<String> =
-        if (hostname != null)
-            listOf("--hostname $hostname")
-        else emptyList()
-
-    private fun buildImage() = "$image${version?.prefix(":") ?: ""}"
-
-    private fun buildExpose(): List<String> = expose.map { "--expose $it" }
-    private fun buildEnv(): List<String> = env.map { "--env $it" }
-
-    private fun buildName(): List<String> = listOf("--name $containerName")
-
-    private fun buildNetworks(): List<String> = networks.map { "--network $it" }
-
-    private fun buildFlags(): String {
-        val enabledOptions = options.filter { it.enabled }
-        return if (enabledOptions.isNotEmpty()) enabledOptions.joinToString(
-            prefix = "-",
-            separator = ""
-        ) { it.type.option } else ""
-    }
-
-    private fun buildPorts() = publishedPorts.map { "-p $it" }
-
-    private fun buildUser(): List<String> = if (user != null) listOf("--user $user") else emptyList()
-}
-
-private fun String?.prefix(prefix: String): String = "$prefix$this"
-
-interface DokkerLifecycle {
-    val name: String
-    fun start()
-    fun stop()
-    fun remove()
-    fun hasStarted(): Boolean
-}
-
-class DokkerContainer(
-    val dokkerRunCommand: DokkerRunCommand,
-    val healthCheck: HealthCheck?,
-    var onStart: (dokker: DokkerContainer, runResponse: String) -> Unit = { _, _ -> },
-) : DokkerLifecycle {
-    override val name = dokkerRunCommand.containerName
-    override fun start() {
-        if (!hasStarted()) {
-            debug("starting docker container $name")
-            checkContainerStopped()
-            onStart(this, dokkerRunCommand.buildRunCommand().runCommand())
-        }
-    }
-
-    private fun checkContainerStopped(errorMessage: String = "Container $name is already stopped and won't be restarted.") {
-        val response = "docker container ls -a -f name=$name --format '{{.Status}}'".runCommand()
-        if (response.contains("Exited")) {
-            error(
-                """$errorMessage
-                |Run `docker rm $name` to remove it.
-                """.trimMargin()
-            )
-        }
-    }
-
-    override fun hasStarted(): Boolean {
-        return "docker ps --filter name=$name".runCommand().contains(name)
-    }
-
-    fun exec(command: String, parameter: String? = null, fail: Boolean = false): String =
-        "docker exec $name $command".runCommand(parameter = parameter, fail)
-
-    fun waitForHealthCheck() {
-        val (timeout, pollingInterval, initialDelay, healthCheck) = healthCheck
-            ?: error("waitForHealthCheck called when none specified in builder")
-
-        debug("health check: starting in $initialDelay every $pollingInterval, for at lease $timeout")
-        debug("executing: ${healthCheck.first}")
-
-        val start = now().toEpochMilli()
-        await atMost timeout withPollInterval pollingInterval withPollDelay initialDelay until {
-            debug("waited ${now().toEpochMilli() - start}")
-            checkContainerStopped("Container $name failed to start properly. Run `docker logs $name` to check why.")
-            val response = exec(command = healthCheck.first, fail = false)
-            response.contains(healthCheck.second)
-        }
-    }
-
-    override fun stop() {
-        "docker stop $name".runCommand(fail = false)
-    }
-
-    override fun remove() {
-        "docker rm $name".runCommand(fail = false)
-    }
-
-    fun exec(command: () -> String) {
-        this.exec(command = command(), fail = false)
-    }
-
-    fun execWithSpacedParameter(command: () -> Pair<String, String?>) {
-        val commandLine = command()
-        this.exec(command = commandLine.first, parameter = commandLine.second, fail = false)
-    }
-
-    companion object {
-        var debug = false
-        private fun debug(info: String) {
-            if (debug) println(info)
-        }
-
-        fun String.runCommand(parameter: String? = null, fail: Boolean = true): String {
-            val commandLine = split(" ").toMutableList()
-            if (parameter != null) commandLine.add(parameter)
-            val processBuilder = ProcessBuilder(commandLine)
-            debug("> ${processBuilder.command()}")
-            val proc = processBuilder.start()
-
-            val result = proc.waitFor()
-            val errorResponse = proc.errorStream.bufferedReader().use(BufferedReader::readText)
-            return if (result != 0 && fail) {
-                error("[$result] could not run docker command ${processBuilder.command()}: $errorResponse")
-            } else if (result != 0) {
-                debug("[$result] could not run docker command ${processBuilder.command()}: $errorResponse")
-                errorResponse
-            } else {
-                proc.inputStream.bufferedReader().use(BufferedReader::readText)
-                    .also { debug("> $it") }
-            }
-        }
-    }
-}
-
-class DokkerNetwork(private val networkName: String) : DokkerLifecycle {
-    override val name = networkName
-    override fun start() {
-        if (!hasStarted())
-            "docker network create $networkName".runCommand()
-    }
-
-    override fun stop() {
-        // no stop on networks
-    }
-
-    override fun remove() {
-        await atMost Durations.ONE_MINUTE until {
-            "docker network rm $networkName".runCommand() == networkName
-        }
-    }
-
-    override fun hasStarted(): Boolean = "docker network ls".runCommand().contains(networkName)
 }
