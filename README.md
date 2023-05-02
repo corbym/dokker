@@ -76,11 +76,11 @@ e.g:
 ```
 ## Access the command that was run
 
-You can get the parameters that were used to run the docker command using `dockerContainer.dokkerRunCommand`, e.g:
+You can get the parameters that were used to run the docker command, e.g:
 ```
-val containerPublishedPorts = myContainer.dokkerRunCommand.publishedPorts
-val exposedPorts = myContainer.dokkerRunCommand.expose
-val image = myContainer.dokkerRunCommand.image
+val containerPublishedPorts = myContainer.publishedPorts
+val exposedPorts = myContainer.expose
+val image = myContainer.image
 
 .. etc ..
 ```
