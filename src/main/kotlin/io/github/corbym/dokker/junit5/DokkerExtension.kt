@@ -12,7 +12,7 @@ fun dokkerExtension(init: DokkerExtensionBuilder.() -> Unit): DokkerExtension {
     return DokkerExtensionBuilder().apply(init).build()
 }
 
-fun findFreePort() = ServerSocket(0).use { "${it.localPort}".also { port -> println(port) } }
+fun findFreePort() = ServerSocket(0).use { "${it.localPort}" }
 
 class DokkerExtensionBuilder {
     private lateinit var dokkerContainer: DokkerContainer
@@ -44,18 +44,12 @@ class DokkerExtension(
     AfterAllCallback,
     DokkerProperties by dokkerContainer, DokkerLifecycle by dokkerContainer {
     override val name: String = dokkerContainer.name
-
     override fun beforeAll(context: ExtensionContext?) {
-        if (!hasStarted())
-            start()
+        if (!hasStarted()) start()
     }
 
     override fun afterAll(context: ExtensionContext?) {
-        if (stopAfter) {
-            stop()
-        }
-        if (removeAfter) {
-            remove()
-        }
+        if (stopAfter) stop()
+        if (removeAfter) remove()
     }
 }

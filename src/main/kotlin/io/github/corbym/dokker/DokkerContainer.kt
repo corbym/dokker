@@ -9,9 +9,10 @@ class DokkerContainer(
     val healthCheck: HealthCheck?,
     var onStart: (dokker: DokkerContainer, runResponse: String) -> Unit = { _, _ -> },
 ) : DokkerLifecycle, DokkerProperties by dokkerRunCommandBuilder {
+    private val withPublishedPorts = if (publishedPorts.isNotEmpty()) " with published ports $publishedPorts" else ""
     override fun start() {
         if (!hasStarted()) {
-            debug("starting docker container $name")
+            debug("starting container: $name with exposed ports $expose$withPublishedPorts ")
             checkContainerStopped()
             onStart(this, dokkerRunCommandBuilder.buildRunCommand().runCommand())
         }
@@ -52,10 +53,12 @@ class DokkerContainer(
     }
 
     override fun stop() {
+        debug("stopping container: $name")
         "docker stop $name".runCommand(fail = false)
     }
 
     override fun remove() {
+        debug("removing container: $name")
         "docker rm $name".runCommand(fail = false)
     }
 
@@ -70,7 +73,7 @@ class DokkerContainer(
 
     companion object {
         var debug = false
-        private fun debug(info: String) {
+        internal fun debug(info: String) {
             if (debug) println(info)
         }
 
