@@ -27,7 +27,7 @@ Dokker is distributed through Maven Central.
 <dependency>
   <groupId>io.github.corbym</groupId>
   <artifactId>dokker</artifactId>
-  <version>0.0.1</version>
+  <version>0.2.0</version>
   <type>module</type>
   <scope>test</scope>
 </dependency>
@@ -35,7 +35,7 @@ Dokker is distributed through Maven Central.
 ### Gradle
 ```
 dependencies {
-  testImplementation("io.github.corbym:dokker:0.0.1")
+  testImplementation("io.github.corbym:dokker:0.2.0")
 }
 ```
 
@@ -135,7 +135,7 @@ interface DokkerLifecycle {
 }
 ```
 
-# Junit5 Extension
+# Junit5 `DokkerProvider` Extension
 You can extend a test with the junit5 `@ExtendWith` annotation and create your own `DokkerProvider`.
 
 See [ExampleDokkerProvider.kt](src/test/kotlin/io/github/corbym/junit5/ExampleDokkerProvider.kt) for more details.
@@ -182,6 +182,44 @@ onStartup { container, _ ->
 The containers are only torn down when the JVM executes a shutdown hook.
 
 If the container fails to start or was already running with the same container name, the framework will NOT run the shutdown hook, and leave the container up.
+
+# Junit5 `DokkerExtension` Extension
+
+The `DokkerExtension` class was created so that the Junit5 `@RegisterExtension` function can be taken advantage of, and is available from 0.2.0 onwards:
+
+```kotlin
+import io.github.corbym.dokker.junit5.DokkerExtension
+import io.github.corbym.dokker.junit5.dokkerExtension
+...
+import io.github.corbym.dokker.junit5.findFreePort
+import org.junit.jupiter.api.extension.RegisterExtension
+class ExampleJUnit5RegisteredDokkerTest {
+    companion object {
+        val couchbasePort = findFreePort()
+
+        @JvmStatic
+        @RegisterExtension
+        val server: DokkerExtension = dokkerExtension {
+            container {
+                dokker {
+                    name("couchbase")
+                    detach()
+                    debug()
+                    expose(couchbasePort)
+                    publish(couchbasePort to couchbasePort)
+                    image { "arungupta/couchbase" }
+                    version { "latest" }
+                }
+                doNotStop()
+            }
+        }
+    }
+... rest of test ...
+}
+```
+This extension starts the container on the `BeforeAll` lifecycle of the test, and will stop the container in the `AfterAll` phase. You can prevent shutdown and removal respectively by specifying `doNotStop()` and `doNotRemove` in the `dokkerExtension` builder.
+
+Note that a random available port was used by calling the utility function `io.github.corbym.dokker.junit5.findFreePort` in the above example. See [`ExampleJUnit5RegisteredDokkerTest`](src/test/kotlin/io/github/corbym/junit5/ExampleJUnit5RegisteredDokkerTest.kt) for more information.
 
 # Contributing
 ## How can I contribute to Dokker?
