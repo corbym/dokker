@@ -36,7 +36,7 @@ class DokkerExtensionBuilder {
     }
 }
 
-class DokkerExtension(
+open class DokkerExtension(
     dokkerContainer: DokkerContainer,
     val stopAfter: Boolean = true,
     val removeAfter: Boolean = true,
