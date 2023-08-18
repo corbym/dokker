@@ -15,6 +15,8 @@ class DokkerContainer(
             debug("starting container: $name with exposed ports $expose$withPublishedPorts ")
             checkContainerStopped()
             onStart(this, dokkerRunCommandBuilder.buildRunCommand().runCommand())
+        } else {
+            waitForHealthCheck()
         }
     }
 
