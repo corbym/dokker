@@ -21,7 +21,7 @@ class DokkerContainer(
     }
 
     private fun checkContainerStopped(errorMessage: String = "Container $name is already stopped and won't be restarted.") {
-        val response = "docker container ls -a -f name=$name --format '{{.Status}}'".runCommand()
+        val response = "docker container ls --all --filter name=^/$name$ --format '{{.Status}}'".runCommand()
         if (response.contains("Exited")) {
             error(
                 """$errorMessage
