@@ -36,7 +36,7 @@ class DokkerContainer(
     }
 
     fun exec(command: String, parameter: String? = null, fail: Boolean = false): String =
-        "docker exec $name $command".runCommand(parameter = parameter, fail)
+        "docker exec -i $name $command".runCommand(parameter = parameter, fail)
 
     fun waitForHealthCheck() {
         val (timeout, pollingInterval, initialDelay, healthCheck) = healthCheck
@@ -94,7 +94,7 @@ class DokkerContainer(
                 debug("[$result] could not run docker command ${processBuilder.command()}: $errorResponse")
                 errorResponse
             } else {
-                proc.inputStream.bufferedReader().use(BufferedReader::readText)
+                proc.inputStream.bufferedReader().use(BufferedReader::readText).trim()
                     .also { debug("> $it") }
             }
         }
