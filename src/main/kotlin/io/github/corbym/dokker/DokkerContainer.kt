@@ -32,7 +32,7 @@ class DokkerContainer(
     }
 
     override fun hasStarted(): Boolean {
-        return "docker ps --filter name=$name".runCommand().contains(name)
+        return "docker ps --filter name=^/$name\$".runCommand().contains(name)
     }
 
     fun exec(command: String, parameter: String? = null, fail: Boolean = false): String =
