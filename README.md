@@ -27,7 +27,7 @@ Dokker is distributed through Maven Central.
 <dependency>
   <groupId>io.github.corbym</groupId>
   <artifactId>dokker</artifactId>
-  <version>0.2.0</version>
+  <version>0.2.5</version>
   <type>module</type>
   <scope>test</scope>
 </dependency>
