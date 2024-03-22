@@ -1,13 +1,11 @@
 package io.github.corbym.junit5
 
-import org.awaitility.Durations
-import org.awaitility.kotlin.atMost
-import org.awaitility.kotlin.await
-import org.awaitility.kotlin.until
+import io.github.corbym.dokker.DokkerContainer.Companion.runCommand
+import io.github.corbym.dokker.awaitUntil
+import io.github.corbym.dokker.junit5.BeforeAllStarter
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import io.github.corbym.dokker.DokkerContainer.Companion.runCommand
-import io.github.corbym.dokker.junit5.BeforeAllStarter
+import java.time.Duration
 import kotlin.test.assertTrue
 
 @ExtendWith(ExampleDokkerProvider::class)
@@ -16,7 +14,7 @@ class ExampleJUnit5DokkerTest {
     fun `can start couchbase docker container`() {
         val name = "couchbase"
         assertTrue(BeforeAllStarter.started[name]!!)
-        await atMost Durations.FIVE_MINUTES until {
+        awaitUntil(Duration.ofMinutes(5)) {
             "docker ps --filter name=$name".runCommand().contains(name)
         }
     }

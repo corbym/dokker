@@ -39,14 +39,13 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
     }
 }
 dependencies {
-    implementation("org.awaitility:awaitility:4.2.0")
-    implementation("org.awaitility:awaitility-kotlin:4.2.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     compileOnly("org.junit.jupiter:junit-jupiter-api:5.10.2")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.2")
+    testImplementation("org.hamcrest:hamcrest:2.2")
 }
 tasks.test {
     useJUnitPlatform()

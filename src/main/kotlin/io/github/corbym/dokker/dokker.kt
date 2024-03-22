@@ -2,7 +2,6 @@ package io.github.corbym.dokker
 
 import io.github.corbym.dokker.OptionType.DETACH
 import io.github.corbym.dokker.OptionType.INTERACTIVE
-import org.awaitility.Durations.ONE_SECOND
 import java.time.Duration
 import java.util.*
 
@@ -145,9 +144,10 @@ data class HealthCheck(
 
 class HealthCheckBuilder {
     private var healthCheck: Pair<String, String>? = null
-    private var pollingInterval: Duration = ONE_SECOND
-    private var initialDelay: Duration = ONE_SECOND
+    private var pollingInterval: Duration = Duration.ofSeconds(1)
+    private var initialDelay: Duration = Duration.ofSeconds(1)
     private var timeout: Duration = initialDelay.multipliedBy(5)
+
     fun pollingInterval(pollingInterval: Duration) {
         this.pollingInterval = pollingInterval
     }
