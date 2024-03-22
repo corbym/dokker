@@ -39,7 +39,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
     }
 }
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     compileOnly("org.junit.jupiter:junit-jupiter-api:5.10.2")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

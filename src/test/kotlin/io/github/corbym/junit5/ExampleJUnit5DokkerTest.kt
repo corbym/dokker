@@ -13,7 +13,7 @@ class ExampleJUnit5DokkerTest {
     @Test
     fun `can start couchbase docker container`() {
         val name = "couchbase"
-        assertTrue(BeforeAllStarter.started[name]!!)
+        assertTrue(BeforeAllStarter.hasStarted(name)!!)
         awaitUntil(Duration.ofMinutes(5)) {
             "docker ps --filter name=$name".runCommand().contains(name)
         }
