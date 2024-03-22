@@ -3,7 +3,7 @@ version = "0.2.5"
 description = "dokker: Simple Kotlin docker builder for tests."
 
 plugins {
-    kotlin("jvm") version "1.8.0"
+    kotlin("jvm") version "1.9.23"
     `maven-publish`
     id("com.dipien.semantic-version") version "2.0.0" apply false
     signing
