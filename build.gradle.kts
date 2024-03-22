@@ -1,5 +1,5 @@
 group = "io.github.corbym"
-version = "0.2.5"
+version = "0.2.6"
 description = "dokker: Simple Kotlin docker builder for tests."
 
 plugins {
