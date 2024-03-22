@@ -1,12 +1,8 @@
 package io.github.corbym.dokker.junit5
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.ExtensionContext
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * BeforeAllStarter starts ONE instance of the container before ALL tests that can run
@@ -26,34 +22,32 @@ interface BeforeAllStarter : BeforeAllCallback {
     val stopCommand: (() -> Unit)?
 
     companion object {
-        private val mutex = Mutex()
-        var started: MutableMap<String, Boolean> = mutableMapOf()
-        fun register(name: String, hasStarted: Boolean) = runBlocking {
-            withContext(Dispatchers.Default) {
-                mutex.withLock {
-                    if (!started.containsKey(name)) {
-                        started[name] = hasStarted
-                    }
-                }
+        private val started = ConcurrentHashMap<String, Boolean>()
+
+        fun hasStarted(id: String): Boolean? = started[id]
+
+        fun register(name: String, hasStarted: Boolean) {
+            started.compute(name) { _, value ->
+                value ?: hasStarted
             }
         }
     }
 
-    override fun beforeAll(context: ExtensionContext?) = runBlocking {
-        withContext(Dispatchers.Default) {
-            mutex.withLock {
-                val hasStarted = started[id] ?: error("beforeAll runner $id was not registered")
-                if (!hasStarted) {
-                    started[id] = true
-                    startCommand()
-                    if (stopCommand != null) // only stop if the provider started it
-                        Runtime.getRuntime().addShutdownHook(object : Thread() {
-                            override fun run() {
-                                stopCommand!!()
-                            }
-                        })
+    override fun beforeAll(context: ExtensionContext?) {
+        started.compute(id) { _, hasStarted ->
+            requireNotNull(hasStarted) { "beforeAll runner $id was not registered" }
+            if (!hasStarted) {
+                startCommand()
+                // only stop if the provider started it
+                stopCommand?.let { command ->
+                    Runtime.getRuntime().addShutdownHook(object : Thread() {
+                        override fun run() {
+                            command()
+                        }
+                    })
                 }
             }
+            true
         }
     }
 }

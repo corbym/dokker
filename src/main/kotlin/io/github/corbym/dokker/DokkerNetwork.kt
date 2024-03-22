@@ -1,10 +1,7 @@
 package io.github.corbym.dokker
 
 import io.github.corbym.dokker.DokkerContainer.Companion.runCommand
-import org.awaitility.Durations
-import org.awaitility.kotlin.atMost
-import org.awaitility.kotlin.await
-import org.awaitility.kotlin.until
+import java.time.Duration
 
 class DokkerNetwork(private val networkName: String) : DokkerLifecycle {
     override val name = networkName
@@ -18,7 +15,7 @@ class DokkerNetwork(private val networkName: String) : DokkerLifecycle {
     }
 
     override fun remove() {
-        await atMost Durations.ONE_MINUTE until {
+        awaitUntil(timeout = Duration.ofMinutes(1)) {
             "docker network rm $networkName".runCommand() == networkName
         }
     }

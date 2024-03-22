@@ -1,6 +1,5 @@
 package io.github.corbym.dokker
 
-import org.awaitility.kotlin.*
 import java.io.BufferedReader
 import java.time.Instant
 
@@ -46,7 +45,11 @@ class DokkerContainer(
         debug("executing: ${healthCheck.first}")
 
         val start = Instant.now().toEpochMilli()
-        await atMost timeout withPollInterval pollingInterval withPollDelay initialDelay until {
+        awaitUntil(
+            timeout = timeout,
+            initialDelay = initialDelay,
+            pollInterval = pollingInterval,
+        ) {
             debug("waited ${Instant.now().toEpochMilli() - start}")
             checkContainerStopped("Container $name failed to start properly. Run `docker logs $name` to check why.")
             val response = exec(command = healthCheck.first, fail = false)
