@@ -1,3 +1,5 @@
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.corbym/dokker?color=4caf50&label=latest%20release)](https://maven-badges.herokuapp.com/maven-central/io.github.corbym/dokker)
+
 # dokker
 
 Simple Kotlin docker builder for tests.
@@ -27,7 +29,7 @@ Dokker is distributed through Maven Central.
 <dependency>
   <groupId>io.github.corbym</groupId>
   <artifactId>dokker</artifactId>
-  <version>0.2.5</version>
+  <version>0.3.0</version>
   <type>module</type>
   <scope>test</scope>
 </dependency>
@@ -35,7 +37,7 @@ Dokker is distributed through Maven Central.
 ### Gradle
 ```
 dependencies {
-  testImplementation("io.github.corbym:dokker:0.2.0")
+  testImplementation("io.github.corbym:dokker:0.3.0")
 }
 ```
 
