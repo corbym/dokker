@@ -12,6 +12,7 @@ fun dokker(init: DokkerContainerBuilder.() -> Unit): DokkerContainer {
 @Suppress("unused")
 class DokkerContainerBuilder {
     private var onStart: (DokkerContainer, String) -> Unit = { _, _ -> }
+    private var process: String = "docker"
     private var name: String = "dockerContainer-${UUID.randomUUID()}"
     private val networks: MutableList<String> = mutableListOf()
     private var expose: MutableList<String> = mutableListOf()
@@ -30,6 +31,11 @@ class DokkerContainerBuilder {
     private var detach: Boolean = false
 
     private var debug: Boolean = false
+
+    fun process(process: String) {
+        this.process = process
+    }
+
     fun name(name: String) {
         this.name = name
     }
@@ -101,6 +107,7 @@ class DokkerContainerBuilder {
     fun build(): DokkerContainer {
         return DokkerContainer(
             DokkerRunCommandBuilder(
+                process = process,
                 name = name,
                 networks = networks,
                 expose = expose,

@@ -9,10 +9,13 @@ class DokkerContainer(
     var onStart: (dokker: DokkerContainer, runResponse: String) -> Unit = { _, _ -> },
 ) : DokkerLifecycle, DokkerProperties by dokkerRunCommandBuilder {
     private val withPublishedPorts = if (publishedPorts.isNotEmpty()) " with published ports $publishedPorts" else ""
+
     override fun start() {
         if (!hasStarted()) {
             debug("starting container: $name with exposed ports $expose$withPublishedPorts ")
             checkContainerStopped()
+            // force networks to exist
+            dokkerRunCommandBuilder.networks.forEach { DokkerNetwork(dokkerRunCommandBuilder.process, it).start() }
             onStart(this, dokkerRunCommandBuilder.buildRunCommand().runCommand())
         } else {
             waitForHealthCheck()
@@ -20,22 +23,22 @@ class DokkerContainer(
     }
 
     private fun checkContainerStopped(errorMessage: String = "Container $name is already stopped and won't be restarted.") {
-        val response = "docker container ls --all --filter name=^/$name$ --format '{{.Status}}'".runCommand()
+        val response = "$process container ls --all --filter name=^/$name$ --format '{{.Status}}'".runCommand()
         if (response.contains("Exited")) {
             error(
                 """$errorMessage
-                |Run `docker rm $name` to remove it.
+                |Run `$process rm $name` to remove it.
                 """.trimMargin()
             )
         }
     }
 
     override fun hasStarted(): Boolean {
-        return "docker ps --filter name=^/$name\$".runCommand().contains(name)
+        return "$process ps --filter name=^/$name\$".runCommand().contains(name)
     }
 
     fun exec(command: String, parameter: String? = null, fail: Boolean = false): String =
-        "docker exec -i $name $command".runCommand(parameter = parameter, fail)
+        "$process exec -i $name $command".runCommand(parameter = parameter, fail)
 
     fun waitForHealthCheck() {
         val (timeout, pollingInterval, initialDelay, healthCheck) = healthCheck
@@ -51,7 +54,7 @@ class DokkerContainer(
             pollInterval = pollingInterval,
         ) {
             debug("waited ${Instant.now().toEpochMilli() - start}")
-            checkContainerStopped("Container $name failed to start properly. Run `docker logs $name` to check why.")
+            checkContainerStopped("Container $name failed to start properly. Run `$process logs $name` to check why.")
             val response = exec(command = healthCheck.first, fail = false)
             response.contains(healthCheck.second)
         }
@@ -59,12 +62,12 @@ class DokkerContainer(
 
     override fun stop() {
         debug("stopping container: $name")
-        "docker stop $name".runCommand(fail = false)
+        "$process stop $name".runCommand(fail = false)
     }
 
     override fun remove() {
         debug("removing container: $name")
-        "docker rm $name".runCommand(fail = false)
+        "$process rm $name".runCommand(fail = false)
     }
 
     fun exec(command: () -> String) {
@@ -92,9 +95,9 @@ class DokkerContainer(
             val result = proc.waitFor()
             val errorResponse = proc.errorStream.bufferedReader().use(BufferedReader::readText)
             return if (result != 0 && fail) {
-                error("[$result] could not run docker command ${processBuilder.command()}: $errorResponse")
+                error("[$result] could not run dokker command ${processBuilder.command()}: $errorResponse")
             } else if (result != 0) {
-                debug("[$result] could not run docker command ${processBuilder.command()}: $errorResponse")
+                debug("[$result] could not run dokker command ${processBuilder.command()}: $errorResponse")
                 errorResponse
             } else {
                 proc.inputStream.bufferedReader().use(BufferedReader::readText).trim()
