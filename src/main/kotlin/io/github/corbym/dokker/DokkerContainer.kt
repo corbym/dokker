@@ -14,8 +14,6 @@ class DokkerContainer(
         if (!hasStarted()) {
             debug("starting container: $name with exposed ports $expose$withPublishedPorts ")
             checkContainerStopped()
-            // force networks to exist
-            dokkerRunCommandBuilder.networks.forEach { DokkerNetwork(dokkerRunCommandBuilder.process, it).start() }
             onStart(this, dokkerRunCommandBuilder.buildRunCommand().runCommand())
         } else {
             waitForHealthCheck()
