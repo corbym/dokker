@@ -21,8 +21,11 @@ object DokkerAutoProcessSearchResult {
     // MacOS defaults to zsh shell.
     //   Intellij does not read ~/.zprofile nor ~/.zshrc scripts so set environment variables in ~/.profile
     //   Otherwise, "command -v" may not find the executable
-    private fun processFullPath(process: String): String? =
-        "command -v $process".runCommand(fail = false).ifBlank { null }
+    private fun processFullPath(process: String): String? = try {
+        "command -v $process".runCommand()
+    } catch (e: Exception) {
+        null
+    }
 
 
     // This name is in an object so that we do this once per process, as this check is expensive
@@ -41,7 +44,7 @@ object DokkerAutoProcessSearchResult {
 }
 
 @Suppress("unused")
-class DokkerContainerBuilder() {
+class DokkerContainerBuilder {
     private var onStart: (DokkerContainer, String) -> Unit = { _, _ -> }
     private var process: String? = null
     private var name: String = "dockerContainer-${UUID.randomUUID()}"
@@ -136,10 +139,9 @@ class DokkerContainerBuilder() {
     }
 
     fun build(): DokkerContainer {
-
         return DokkerContainer(
             DokkerRunCommandBuilder(
-                process = process?: DokkerAutoProcessSearchResult.processName,
+                process = process ?: DokkerAutoProcessSearchResult.processName,
                 name = name,
                 networks = networks,
                 expose = expose,
