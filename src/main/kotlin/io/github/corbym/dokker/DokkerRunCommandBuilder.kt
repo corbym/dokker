@@ -1,6 +1,7 @@
 package io.github.corbym.dokker
 
 class DokkerRunCommandBuilder(
+    override val process: String,
     override val name: String,
     override val networks: List<String>,
     override var expose: List<String>,
@@ -14,7 +15,7 @@ class DokkerRunCommandBuilder(
     override var user: String? = null,
     override vararg val options: Option,
 ) : DokkerProperties {
-    fun buildRunCommand(): String = "docker run${buildOptions()} ${buildImage()}${command?.prefix(" ") ?: ""}"
+    fun buildRunCommand(): String = "$process run${buildOptions()} ${buildImage()}${command?.prefix(" ") ?: ""}"
     private fun buildOptions() = listOf(
         listOf(buildFlags()),
         buildName(),

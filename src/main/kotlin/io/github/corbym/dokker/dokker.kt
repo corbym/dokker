@@ -1,5 +1,6 @@
 package io.github.corbym.dokker
 
+import io.github.corbym.dokker.DokkerContainer.Companion.runCommand
 import io.github.corbym.dokker.OptionType.DETACH
 import io.github.corbym.dokker.OptionType.INTERACTIVE
 import java.time.Duration
@@ -9,9 +10,40 @@ fun dokker(init: DokkerContainerBuilder.() -> Unit): DokkerContainer {
     return DokkerContainerBuilder().apply(init).build()
 }
 
+// Search order is
+// 1. process name set in code (if set, DokkerAutoProcessSearchResult.processName is not used)
+// 2. environment variable (if found in path)
+// 3. hardcoded "docker" (if found in path)
+// 3. hardcoded "podman" (if found in path)
+internal object DokkerAutoProcessSearchResult {
+
+    // Note that "command -v" - this is best-effort as adding an 'alias' will cause issues
+    // MacOS defaults to zsh shell.
+    //   Intellij does not read ~/.zprofile nor ~/.zshrc scripts so set environment variables in ~/.profile
+    //   Otherwise, "command -v" may not find the executable
+    private fun processFullPath(process: String): String? =
+        "command -v $process".runCommand(fail = false).ifBlank { null }
+
+
+    // This name is in an object so that we do this once per process, as this check is expensive
+    val processName: String = run {
+        val configured = System.getenv("DOKKER_PROCESS")
+        requireNotNull(listOfNotNull(configured, "docker", "podman").firstNotNullOfOrNull { processFullPath(it) }) {
+            """
+                Unable to find an underlying process executable.
+                Please make sure that any of the supporting application process is available and on the PATH
+                1. Current env configured DOKKER_PROCESS: $configured
+                2. docker
+                3. podman
+            """.trimIndent()
+        }
+    }
+}
+
 @Suppress("unused")
-class DokkerContainerBuilder {
+class DokkerContainerBuilder() {
     private var onStart: (DokkerContainer, String) -> Unit = { _, _ -> }
+    private var process: String? = null
     private var name: String = "dockerContainer-${UUID.randomUUID()}"
     private val networks: MutableList<String> = mutableListOf()
     private var expose: MutableList<String> = mutableListOf()
@@ -30,6 +62,11 @@ class DokkerContainerBuilder {
     private var detach: Boolean = false
 
     private var debug: Boolean = false
+
+    fun process(process: String) {
+        this.process = process
+    }
+
     fun name(name: String) {
         this.name = name
     }
@@ -99,8 +136,10 @@ class DokkerContainerBuilder {
     }
 
     fun build(): DokkerContainer {
+
         return DokkerContainer(
             DokkerRunCommandBuilder(
+                process = process?: DokkerAutoProcessSearchResult.processName,
                 name = name,
                 networks = networks,
                 expose = expose,

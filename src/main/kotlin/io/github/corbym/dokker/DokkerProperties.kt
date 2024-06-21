@@ -1,6 +1,7 @@
 package io.github.corbym.dokker
 
 interface DokkerProperties {
+    val process: String
     val name: String
     val networks: List<String>
     var expose: List<String>
