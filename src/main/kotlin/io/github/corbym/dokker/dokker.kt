@@ -30,7 +30,7 @@ object DokkerAutoProcessSearchResult {
 
     // This name is in an object so that we do this once per process, as this check is expensive
     val processName: String = run {
-        val configured = System.getenv("DOKKER_PROCESS")
+        val configured : String? = System.getenv("DOKKER_PROCESS")
         requireNotNull(listOfNotNull(configured, "docker", "podman").firstNotNullOfOrNull { processFullPath(it) }) {
             """
                 Unable to find an underlying process executable.
