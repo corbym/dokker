@@ -15,17 +15,14 @@ fun dokker(init: DokkerContainerBuilder.() -> Unit): DokkerContainer {
 // 2. environment variable (if found in path)
 // 3. hardcoded "docker" (if found in path)
 // 3. hardcoded "podman" (if found in path)
-object DokkerAutoProcessSearchResult {
+internal object DokkerAutoProcessSearchResult {
 
     // Note that "command -v" - this is best-effort as adding an 'alias' will cause issues
     // MacOS defaults to zsh shell.
     //   Intellij does not read ~/.zprofile nor ~/.zshrc scripts so set environment variables in ~/.profile
     //   Otherwise, "command -v" may not find the executable
-    private fun processFullPath(process: String): String? = try {
-        "command -v $process".runCommand()
-    } catch (e: Exception) {
-        null
-    }
+    private fun processFullPath(process: String): String? =
+            "sh -c".runCommand(parameter = "command -v $process", fail = false).ifBlank { null }
 
 
     // This name is in an object so that we do this once per process, as this check is expensive
