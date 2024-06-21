@@ -84,9 +84,9 @@ class DokkerContainer(
         }
 
         fun String.runCommand(parameter: String? = null, fail: Boolean = true): String {
-            val command = if (parameter != null) "$this $parameter" else this
-            val processBuilder = ProcessBuilder("sh", "-c", command)
-
+            val commandLine = split(" ").toMutableList()
+            if (parameter != null) commandLine.add(parameter)
+            val processBuilder = ProcessBuilder(commandLine)
             debug("> ${processBuilder.command()}")
             val proc = processBuilder.start()
 

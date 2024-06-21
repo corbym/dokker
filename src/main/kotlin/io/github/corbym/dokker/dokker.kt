@@ -21,16 +21,12 @@ object DokkerAutoProcessSearchResult {
     // MacOS defaults to zsh shell.
     //   Intellij does not read ~/.zprofile nor ~/.zshrc scripts so set environment variables in ~/.profile
     //   Otherwise, "command -v" may not find the executable
-    private fun processFullPath(process: String): String? = try {
-        "command -v $process".runCommand()
-    } catch (e: Exception) {
-        null
-    }
-
+    private fun processFullPath(process: String): String? =
+        "sh -c".runCommand(parameter = "command -v $process", fail = false).ifBlank { null }
 
     // This name is in an object so that we do this once per process, as this check is expensive
     val processName: String = run {
-        val configured : String? = System.getenv("DOKKER_PROCESS")
+        val configured: String? = System.getenv("DOKKER_PROCESS")
         requireNotNull(listOfNotNull(configured, "docker", "podman").firstNotNullOfOrNull { processFullPath(it) }) {
             """
                 Unable to find an underlying process executable.
