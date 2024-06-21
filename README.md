@@ -223,7 +223,7 @@ This extension starts the container on the `BeforeAll` lifecycle of the test, an
 
 Note that a random available port was used by calling the utility function `io.github.corbym.dokker.junit5.findFreePort` in the above example. See [`ExampleJUnit5RegisteredDokkerTest`](src/test/kotlin/io/github/corbym/junit5/ExampleJUnit5RegisteredDokkerTest.kt) for more information.
 
-# Podman support
+# Podman support (v0.4.0 onwards)
 
 Dokker now provides a way to specify which process is used under the hood:
 
