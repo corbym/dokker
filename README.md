@@ -228,9 +228,11 @@ Note that a random available port was used by calling the utility function `io.g
 Dokker now provides a way to specify which process is used under the hood:
 
 Either the process name can be set in code (if set, DokkerAutoProcessSearchResult.processName is not used)
+```
 dokker {
   process("specificProcessName") ...
 }
+```
 
 Otherwise, we check that any of the following process names exists in the path (by invoking 'command -v', which should exist in WSL as well)
 * environment variable (`DOKKER_PROCESS`)
