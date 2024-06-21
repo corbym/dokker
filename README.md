@@ -223,6 +223,20 @@ This extension starts the container on the `BeforeAll` lifecycle of the test, an
 
 Note that a random available port was used by calling the utility function `io.github.corbym.dokker.junit5.findFreePort` in the above example. See [`ExampleJUnit5RegisteredDokkerTest`](src/test/kotlin/io/github/corbym/junit5/ExampleJUnit5RegisteredDokkerTest.kt) for more information.
 
+# Podman support
+
+Dokker now provides a way to specify which process is used under the hood:
+
+Either the process name can be set in code (if set, DokkerAutoProcessSearchResult.processName is not used)
+dokker {
+  process("specificProcessName") ...
+}
+
+Otherwise, we check that any of the following process names exists in the path (by invoking 'command -v', which should exist in WSL as well)
+* environment variable (`DOKKER_PROCESS`)
+* hardcoded "docker"
+* hardcoded "podman"
+  
 # Contributing
 ## How can I contribute to Dokker?
 
