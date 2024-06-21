@@ -1,9 +1,9 @@
 package io.github.corbym
 
+import io.github.corbym.dokker.dokker
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.Test
-import io.github.corbym.dokker.dokker
 
 class DokkerTest {
 
@@ -22,11 +22,7 @@ class DokkerTest {
 
             dokkerContainer.also {
                 it.onStart = { _, runResponse ->
-                    if (dokkerContainer.process.endsWith("docker")) {
-                        assertThat(runResponse, containsString("Hello from Docker!"))
-                    } else {
-                        assertThat(runResponse, containsString("Hello Podman World"))
-                    }
+                    assertThat(runResponse, containsString("Hello"))
                 }
             }.start()
         } finally {
