@@ -1,6 +1,5 @@
 package io.github.corbym.dokker
 
-import io.github.corbym.dokker.DokkerContainer.Companion.runCommand
 import io.github.corbym.dokker.OptionType.DETACH
 import io.github.corbym.dokker.OptionType.INTERACTIVE
 import java.time.Duration
@@ -10,24 +9,10 @@ fun dokker(init: DokkerContainerBuilder.() -> Unit): DokkerContainer {
     return DokkerContainerBuilder().apply(init).build()
 }
 
-// Search order is
-// 1. process name set in code (if set, DokkerAutoProcessSearchResult.processName is not used)
-// 2. environment variable (if found in path)
-// 3. hardcoded "docker" (if found in path)
-// 3. hardcoded "podman" (if found in path)
 object DokkerAutoProcessSearchResult {
-
-    // Note that "command -v" - this is best-effort as adding an 'alias' will cause issues
-    // MacOS defaults to zsh shell.
-    //   Intellij does not read ~/.zprofile nor ~/.zshrc scripts so set environment variables in ~/.profile
-    //   Otherwise, "command -v" may not find the executable
-    private fun processFullPath(process: String): String? =
-        "sh -c".runCommand(parameter = "command -v $process", fail = false).ifBlank { null }
-
-    // This name is in an object so that we do this once per process, as this check is expensive
     val processName: String = run {
         val configured: String? = System.getenv("DOKKER_PROCESS")
-        requireNotNull(listOfNotNull(configured, "docker", "podman").firstNotNullOfOrNull { processFullPath(it) }) {
+        requireNotNull(listOfNotNull(configured, "docker").firstOrNull()) {
             """
                 Unable to find an underlying process executable.
                 Please make sure that any of the supporting application process is available and on the PATH
