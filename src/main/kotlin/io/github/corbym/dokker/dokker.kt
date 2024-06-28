@@ -9,10 +9,8 @@ fun dokker(init: DokkerContainerBuilder.() -> Unit): DokkerContainer {
     return DokkerContainerBuilder().apply(init).build()
 }
 
-object DokkerAutoProcessSearchResult {
-    val processName: String = run {
-        System.getenv("DOKKER_PROCESS") ?: "docker"
-    }
+object DokkerProcessName {
+    val processName: String = System.getenv("DOKKER_PROCESS") ?: "docker"
 }
 
 @Suppress("unused")
@@ -113,7 +111,7 @@ class DokkerContainerBuilder {
     fun build(): DokkerContainer {
         return DokkerContainer(
             DokkerRunCommandBuilder(
-                process = process ?: DokkerAutoProcessSearchResult.processName,
+                process = process ?: DokkerProcessName.processName,
                 name = name,
                 networks = networks,
                 expose = expose,
