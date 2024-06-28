@@ -11,8 +11,7 @@ fun dokker(init: DokkerContainerBuilder.() -> Unit): DokkerContainer {
 
 object DokkerAutoProcessSearchResult {
     val processName: String = run {
-        val configured: String? = System.getenv("DOKKER_PROCESS")
-        listOfNotNull(configured, "docker").first()
+        System.getenv("DOKKER_PROCESS") ?: "dokker"
     }
 }
 
