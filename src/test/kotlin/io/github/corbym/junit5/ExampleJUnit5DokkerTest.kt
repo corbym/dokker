@@ -1,7 +1,7 @@
 package io.github.corbym.junit5
 
 import io.github.corbym.dokker.DokkerContainer.Companion.runCommand
-import io.github.corbym.dokker.DokkerAutoProcessSearchResult
+import io.github.corbym.dokker.DokkerProcessName
 import io.github.corbym.dokker.awaitUntil
 import io.github.corbym.dokker.junit5.BeforeAllStarter
 import org.junit.jupiter.api.Test
@@ -16,7 +16,7 @@ class ExampleJUnit5DokkerTest {
         val name = "couchbase"
         assertTrue(BeforeAllStarter.hasStarted(name)!!)
         awaitUntil(Duration.ofMinutes(5)) {
-            "${DokkerAutoProcessSearchResult.processName} ps --filter name=$name".runCommand().contains(name)
+            "${DokkerProcessName.processName} ps --filter name=$name".runCommand().contains(name)
         }
     }
 }
