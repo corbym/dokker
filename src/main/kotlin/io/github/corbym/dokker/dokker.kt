@@ -12,15 +12,7 @@ fun dokker(init: DokkerContainerBuilder.() -> Unit): DokkerContainer {
 object DokkerAutoProcessSearchResult {
     val processName: String = run {
         val configured: String? = System.getenv("DOKKER_PROCESS")
-        requireNotNull(listOfNotNull(configured, "docker").firstOrNull()) {
-            """
-                Unable to find an underlying process executable.
-                Please make sure that any of the supporting application process is available and on the PATH
-                1. Current env configured DOKKER_PROCESS: $configured
-                2. docker
-                3. podman
-            """.trimIndent()
-        }
+        listOfNotNull(configured, "docker").first()
     }
 }
 
