@@ -225,19 +225,18 @@ Note that a random available port was used by calling the utility function `io.g
 
 # Podman support (v0.4.0 onwards)
 
-Dokker now provides a way to specify which process is used under the hood:
+Dokker now provides a way to specify which process is used under the hood.
 
-Either the process name can be set in code (if set, DokkerAutoProcessSearchResult.processName is not used)
+Either the process name can be set in code:
 ```
 dokker {
   process("specificProcessName") ...
 }
 ```
 
-Otherwise, we check that any of the following process names exists in the path (by invoking 'command -v', which should exist in WSL as well)
+Otherwise, it uses: 
 * environment variable (`DOKKER_PROCESS`)
 * hardcoded "docker"
-* hardcoded "podman"
   
 # Contributing
 ## How can I contribute to Dokker?
