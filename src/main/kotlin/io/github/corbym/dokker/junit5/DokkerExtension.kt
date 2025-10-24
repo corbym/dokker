@@ -44,11 +44,11 @@ open class DokkerExtension(
     AfterAllCallback,
     DokkerProperties by dokkerContainer, DokkerLifecycle by dokkerContainer {
     override val name: String = dokkerContainer.name
-    override fun beforeAll(context: ExtensionContext?) {
+    override fun beforeAll(context: ExtensionContext) {
         if (!hasStarted()) start()
     }
 
-    override fun afterAll(context: ExtensionContext?) {
+    override fun afterAll(context: ExtensionContext) {
         if (stopAfter) stop()
         if (removeAfter) remove()
     }

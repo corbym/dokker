@@ -33,7 +33,7 @@ interface BeforeAllStarter : BeforeAllCallback {
         }
     }
 
-    override fun beforeAll(context: ExtensionContext?) {
+    override fun beforeAll(context: ExtensionContext) {
         started.compute(id) { _, hasStarted ->
             requireNotNull(hasStarted) { "beforeAll runner $id was not registered" }
             if (!hasStarted) {

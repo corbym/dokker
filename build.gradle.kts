@@ -1,12 +1,20 @@
 group = "io.github.corbym"
 version = "0.4.1"
+// TODO: version = "0.5.0"
 description = "dokker: Simple Kotlin docker builder for tests."
 
 plugins {
-    kotlin("jvm") version "1.9.23"
+    kotlin("jvm") version "2.2.21"
     `maven-publish`
     id("com.dipien.semantic-version") version "2.0.0" apply false
     signing
+}
+
+apply(plugin = "kotlin")
+kotlin {
+    jvmToolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 signing {
@@ -21,30 +29,18 @@ signing {
     sign(publishing.publications)
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-    withJavadocJar()
-    withSourcesJar()
-}
-
-tasks.create("applySemanticVersionPlugin") {
+tasks.register("applySemanticVersionPlugin") {
     dependsOn("prepareKotlinBuildScriptModel")
     apply(plugin = "com.dipien.semantic-version")
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-}
 dependencies {
-    compileOnly("org.junit.jupiter:junit-jupiter-api:5.10.2")
+    compileOnly("org.junit.jupiter:junit-jupiter-api:6.0.0")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.2")
-    testImplementation("org.hamcrest:hamcrest:2.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:6.0.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:6.0.0")
+    testImplementation("org.hamcrest:hamcrest:3.0")
 }
 tasks.test {
     useJUnitPlatform()
@@ -107,4 +103,3 @@ publishing {
         }
     }
 }
-
