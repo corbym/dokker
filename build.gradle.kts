@@ -11,12 +11,7 @@ plugins {
 
 java {
     withSourcesJar()
-}
-
-val javadocJar by tasks.registering(Jar::class) {
-    dependsOn(tasks.named("dokkaJavadoc"))
-    archiveClassifier.set("javadoc")
-    from(tasks.named("dokkaJavadoc"))
+    withJavadocJar()
 }
 
 apply(plugin = "kotlin")
