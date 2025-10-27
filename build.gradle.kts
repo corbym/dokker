@@ -1,5 +1,5 @@
 group = "io.github.corbym"
-version = "0.5.1"
+version = "0.5.2"
 description = "dokker: Simple Kotlin docker builder for tests."
 
 plugins {
@@ -7,6 +7,16 @@ plugins {
     `maven-publish`
     id("com.dipien.semantic-version") version "2.0.0" apply false
     signing
+}
+
+java {
+    withSourcesJar()
+}
+
+val javadocJar by tasks.registering(Jar::class) {
+    dependsOn(tasks.named("dokkaJavadoc"))
+    archiveClassifier.set("javadoc")
+    from(tasks.named("dokkaJavadoc"))
 }
 
 apply(plugin = "kotlin")
