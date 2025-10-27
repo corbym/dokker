@@ -23,3 +23,26 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.PGP_SECRET }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PGP_PASSPHRASE }}
+      - name: Hand off staging repo to Central Portal, then auto publish
+        if: success() # ensure your upload succeeded
+        env:
+          NAMESPACE: io.github.corbym
+          SONATYPE_TOKEN_USER: ${{ secrets.OSSRH_USERNAME }}
+          SONATYPE_TOKEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+        run: |
+          # Build Bearer token, base64 of "<token-username>:<token-password>"
+          AUTH=$(printf '%s:%s' "$SONATYPE_TOKEN_USER" "$SONATYPE_TOKEN_PASSWORD" | base64 | tr -d '\n')
+          set -e
+          echo "Handing off defaultRepository for namespace ${NAMESPACE} to Portal with automatic publish..."
+          http_code=$(curl -sS -o /tmp/resp.json -w '%{http_code}' \
+            -X POST \
+            -H "Authorization: Bearer ${AUTH}" \
+            "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/${NAMESPACE}?publishing_type=automatic")
+          echo "API response:"
+          cat /tmp/resp.json || true
+          if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+            echo "Handoff request accepted by OSSRH Staging API"
+          else
+            echo "Handoff failed with HTTP ${http_code}" >&2
+            exit 1
+          fi
