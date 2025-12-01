@@ -100,7 +100,7 @@ val dockerContainer = dokker {
     }
     onStartup { container, _ ->
       .. commands to run on docker etc..
-      container.executeHealthCheck()
+      container.waitForHealthCheck()
     }
 }
 
