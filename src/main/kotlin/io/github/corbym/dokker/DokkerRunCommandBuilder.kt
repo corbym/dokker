@@ -15,9 +15,14 @@ class DokkerRunCommandBuilder(
     override var user: String? = null,
     override vararg val options: Option,
 ) : DokkerProperties {
-    fun buildRunCommand(): String = "$process run${buildOptions()} ${buildImage()}${command?.prefix(" ") ?: ""}"
-    private fun buildOptions() = listOf(
-        listOf(buildFlags()),
+    fun buildRunCommand(): List<String> =
+        listOf(process, "run") + buildOptions() + listOf(buildImage()) +
+            // Command is split on spaces for backwards compatibility; arguments with embedded
+            // spaces must be passed via execWithSpacedParameter or exec(command, parameter).
+            (command?.split(" ") ?: emptyList())
+
+    private fun buildOptions(): List<String> = listOf(
+        buildFlags(),
         buildName(),
         buildExpose(),
         buildPorts(),
@@ -28,38 +33,32 @@ class DokkerRunCommandBuilder(
         buildUser(),
     ).flatten()
         .filter { it.isNotEmpty() }
-        .joinToString(separator = " ", prefix = " ")
 
     private fun buildMemoryLimit(): List<String> =
-        if (memory != null)
-            listOf("--memory $memory")
-        else emptyList()
+        if (memory != null) listOf("--memory", memory!!) else emptyList()
 
     private fun buildHostName(): List<String> =
-        if (hostname != null)
-            listOf("--hostname $hostname")
-        else emptyList()
+        if (hostname != null) listOf("--hostname", hostname!!) else emptyList()
 
     private fun buildImage() = "$image${version?.prefix(":") ?: ""}"
 
-    private fun buildExpose(): List<String> = expose.map { "--expose $it" }
-    private fun buildEnv(): List<String> = env.map { "--env $it" }
+    private fun buildExpose(): List<String> = expose.flatMap { listOf("--expose", it) }
+    private fun buildEnv(): List<String> = env.flatMap { listOf("--env", it) }
 
-    private fun buildName(): List<String> = listOf("--name $name")
+    private fun buildName(): List<String> = listOf("--name", name)
 
-    private fun buildNetworks(): List<String> = networks.map { "--network $it" }
+    private fun buildNetworks(): List<String> = networks.flatMap { listOf("--network", it) }
 
-    private fun buildFlags(): String {
+    private fun buildFlags(): List<String> {
         val enabledOptions = options.filter { it.enabled }
-        return if (enabledOptions.isNotEmpty()) enabledOptions.joinToString(
-            prefix = "-",
-            separator = ""
-        ) { it.type.option } else ""
+        return if (enabledOptions.isNotEmpty())
+            listOf(enabledOptions.joinToString(prefix = "-", separator = "") { it.type.option })
+        else emptyList()
     }
 
-    private fun buildPorts() = publishedPorts.map { "-p $it" }
+    private fun buildPorts(): List<String> = publishedPorts.flatMap { listOf("-p", it) }
 
-    private fun buildUser(): List<String> = if (user != null) listOf("--user $user") else emptyList()
+    private fun buildUser(): List<String> = if (user != null) listOf("--user", user!!) else emptyList()
 }
 
 fun String?.prefix(prefix: String): String = "$prefix$this"

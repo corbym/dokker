@@ -55,9 +55,8 @@ repositories {
 }
 
 publishing {
-    publishing {
-        publications {
-            create<MavenPublication>("mavenJava") {
+    publications {
+        create<MavenPublication>("mavenJava") {
                 artifactId = "dokker"
                 from(components["java"])
                 versionMapping {
@@ -93,7 +92,6 @@ publishing {
                 }
             }
         }
-    }
     repositories {
         maven {
             name = "OSSRH"

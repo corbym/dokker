@@ -20,5 +20,8 @@ class DokkerNetwork(private val process: String, private val networkName: String
         }
     }
 
-    override fun hasStarted(): Boolean = "$process network ls".runCommand().contains(networkName)
+    override fun hasStarted(): Boolean =
+        "$process network ls".runCommand().lines().drop(1).any { line ->
+            line.trim().split("\\s+".toRegex()).getOrNull(1) == networkName
+        }
 }
