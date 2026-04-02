@@ -11,18 +11,18 @@ internal fun awaitUntil(
 ) {
     initialDelay?.let { Thread.sleep(it.toMillis()) }
     val endTime = Instant.now().plus(timeout)
-    var fullfilled = condition()
+    var fulfilled = condition()
     while (true) {
-        if (fullfilled) {
+        if (fulfilled) {
             break
         }
         if (Instant.now() >= endTime) {
             break
         }
         Thread.sleep(pollInterval.toMillis())
-        fullfilled = condition()
+        fulfilled = condition()
     }
-    if (!fullfilled) {
+    if (!fulfilled) {
         error("condition was not completed within $timeout")
     }
 }

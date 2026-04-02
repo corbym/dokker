@@ -2,6 +2,7 @@ package io.github.corbym.dokker
 
 import java.io.BufferedReader
 import java.time.Instant
+import java.util.concurrent.CompletableFuture
 
 class DokkerContainer(
     private val dokkerRunCommandBuilder: DokkerRunCommandBuilder,
@@ -15,7 +16,7 @@ class DokkerContainer(
             debug("starting container: $name with exposed ports $expose$withPublishedPorts ")
             checkContainerStopped()
             onStart(this, dokkerRunCommandBuilder.buildRunCommand().runCommand())
-        } else {
+        } else if (healthCheck != null) {
             waitForHealthCheck()
         }
     }
@@ -86,20 +87,28 @@ class DokkerContainer(
         fun String.runCommand(parameter: String? = null, fail: Boolean = true): String {
             val commandLine = split(" ").toMutableList()
             if (parameter != null) commandLine.add(parameter)
-            val processBuilder = ProcessBuilder(commandLine)
+            return commandLine.runCommand(fail)
+        }
+
+        fun List<String>.runCommand(fail: Boolean = true): String {
+            val processBuilder = ProcessBuilder(this)
             debug("> ${processBuilder.command()}")
             val proc = processBuilder.start()
 
+            // Read streams concurrently to prevent pipe-buffer deadlock when output is large
+            val stdoutFuture = CompletableFuture.supplyAsync { proc.inputStream.bufferedReader().use(BufferedReader::readText) }
+            val stderrFuture = CompletableFuture.supplyAsync { proc.errorStream.bufferedReader().use(BufferedReader::readText) }
             val result = proc.waitFor()
-            val errorResponse = proc.errorStream.bufferedReader().use(BufferedReader::readText)
+            val output = stdoutFuture.get()
+            val errorResponse = stderrFuture.get()
+
             return if (result != 0 && fail) {
                 error("[$result] could not run dokker command ${processBuilder.command()}: $errorResponse")
             } else if (result != 0) {
                 debug("[$result] could not run dokker command ${processBuilder.command()}: $errorResponse")
                 errorResponse
             } else {
-                proc.inputStream.bufferedReader().use(BufferedReader::readText).trim()
-                    .also { debug("> $it") }
+                output.trim().also { debug("> $it") }
             }
         }
     }
