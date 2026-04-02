@@ -1,132 +1,136 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.corbym/dokker?color=4caf50&label=latest%20release)](https://maven-badges.herokuapp.com/maven-central/io.github.corbym/dokker)
 [![Build Status](https://github.com/corbym/dokker/actions/workflows/build-dokker-project.yml/badge.svg)](https://github.com/corbym/dokker/actions/workflows/build-dokker-project.yml)
 
-# dokker
+# Dokker
 
-Simple Kotlin docker builder for tests.
+Simple Kotlin Docker builder for tests.
 
 ## What is Dokker?
 
-Dokker is a lightweight kotlin wrapper around a docker container and allows you to build, start, stop, execute commands on and remove your docker containers.
+Dokker is a lightweight Kotlin wrapper around the Docker command line that lets you build, start, stop, execute commands on, and remove Docker containers from your tests.
 
-## Who is it for?
+If you want a container for tests but prefer a Kotlin-idiomatic API, Dokker provides an alternative to libraries like [TestContainers](https://www.testcontainers.org/).
 
-If you want a container for tests but need a more Kotlin way to do things, Dokker provides an alternative to libraries like [TestContainers](https://www.testcontainers.org/).
+## Requirements
 
-# Requirements
-
-## What software is required to use Dokker?
-
-You must have docker command line installed on your system:
+You must have the Docker command line installed on your system:
 
 https://docs.docker.com/get-docker/
 
-## How do I install Dokker?
+## Installation
 
 Dokker is distributed through Maven Central.
 
 ### Maven
-```
+
+```xml
 <dependency>
   <groupId>io.github.corbym</groupId>
   <artifactId>dokker</artifactId>
-  <version>0.3.0</version>
-  <type>module</type>
+  <version>0.5.2</version>
   <scope>test</scope>
 </dependency>
 ```
+
 ### Gradle
-```
+
+```kotlin
 dependencies {
-  testImplementation("io.github.corbym:dokker:0.3.0")
+  testImplementation("io.github.corbym:dokker:0.5.2")
 }
 ```
 
-# Getting Started
-## How do I create a Dokker container?
+## Getting Started
 
-The dokker builder builds a docker command line and executes it via `java.lang.ProcessBuilder` process. This is encapsulated in a [DokkerContainer](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/dokker.kt#L271:~:text=271-,class%20DokkerContainer(,-274)) class.
-e.g:
+### Creating a container
+
+The `dokker { }` builder constructs a Docker command line and executes it via `java.lang.ProcessBuilder`. It returns a [`DokkerContainer`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/DokkerContainer.kt):
 
 ```kotlin
 val myContainer = dokker {
     name("my-container")
     detach()
-
     expose("9092", "29092", "9101")
     image { "my/container" }
     version { "1.1" }
     publish("12300" to "12300")
     network("local-network")
     env(
-      "MY_CONFIG_PROP" to "hello"
+        "MY_CONFIG_PROP" to "hello"
     )
 }
 ```
-Calling `start()` on the resulting object attempts to `docker run` the container using `ProcessBuilder` to run the `docker` command line client.
 
-Calling `stop()` on the resulting object attempts to `docker stop` the container using `ProcessBuilder` to run the `docker` command line client.
+### Starting, stopping, and removing
 
-Calling `remove()` on the resulting object attempts to `docker rm` the container using `ProcessBuilder` to run the `docker` command line client.
+| Method | Docker command |
+|---|---|
+| `myContainer.start()` | `docker run` |
+| `myContainer.stop()` | `docker stop` |
+| `myContainer.remove()` | `docker rm` |
 
+### Accessing container properties
 
-`DokkerContainer` implements `DokkerLifeCycle` so you can manage containers in sets.
-
-You can use the [`DockerContainer::String.runCommand`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/dokker.kt#L271:~:text=271-,class%20DokkerContainer(,-274)) independently too:
-e.g:
-```
-"docker ps".runCommand()`
-```
-## Access the command that was run
-
-You can get the parameters that were used to run the docker command, e.g:
-```
-val containerPublishedPorts = myContainer.publishedPorts
-val exposedPorts = myContainer.expose
-val image = myContainer.image
-
-.. etc ..
-```
-
-## Execute Health Check
-Executes the health check given in the configuration with an initial delay, timeout and polling interval. E.g.
+You can read back the configuration used to run the container:
 
 ```kotlin
-val dockerContainer = dokker {
+val publishedPorts = myContainer.publishedPorts
+val exposedPorts = myContainer.expose
+val image = myContainer.image
+// etc.
+```
+
+### Health checks
+
+Dokker can poll a command until an expected response is returned, with a configurable initial delay, polling interval, and timeout. Note that this polls via `exec` inside the container and does **not** use Docker's built-in health check functionality.
+
+```kotlin
+val myContainer = dokker {
     healthCheck {
-      timeout(Duration.ofSeconds(30))
-      pollingInterval(TEN_SECONDS)
-      initialDelay(TEN_SECONDS)
-      checking { "curl -i --fail http://localhost:8080/health?ready=1" to "HTTP/1.1 200 OK" }
+        timeout(Duration.ofSeconds(30))
+        pollingInterval(Duration.ofSeconds(10))
+        initialDelay(Duration.ofSeconds(10))
+        checking { "curl -i --fail http://localhost:8080/health?ready=1" to "HTTP/1.1 200 OK" }
     }
     onStartup { container, _ ->
-      .. commands to run on docker etc..
-      container.waitForHealthCheck()
+        container.waitForHealthCheck()
     }
 }
-
 ```
-Note: this does *not* use docker's built in healthCheck functionality.
 
-## Other configuration
+### Running arbitrary commands
 
-The `DokkerContainer` object reflects most of the commands you can execute on the command line, including:
+You can run commands against a container with `exec`:
 
-* start
-* stop
-* exec
-* execWithSpacedParameter - this allows you to pass ProcessBuilder a command parameter which may contain spaces, and is a workaround really.  
-
-# DokkerNetwork
-Running a network in docker is slightly different to starting a container. To help with this, a there is a special object for a network called [`DokkerNetwork`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/dokker.kt#L271:~:text=364-,class%20DokkerNetwork(private%20val%20networkName%3A%20String)%20%3A%20DokkerLifecycle%20%7B,-Search%20for%20this):
-```kotlin 
-val myNetwork = DokkerNetwork("some-network").also { it.start() }
+```kotlin
+myContainer.exec("some-command")
 ```
-`DokkerNetwork` also implements the `DokkerLifeCycle` so it can be managed with containers (see below).
 
-# DokkerLifecycle 
+Use `execWithSpacedParameter` when a command argument contains spaces (a limitation of `ProcessBuilder`):
 
-Every [`DokkerContainer`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/dokker.kt#L271:~:text=271-,class%20DokkerContainer(,-274)) and [`DokkerNetwork`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/dokker.kt#L271:~:text=364-,class%20DokkerNetwork(private%20val%20networkName%3A%20String)%20%3A%20DokkerLifecycle%20%7B,-Search%20for%20this) implements the [`DokkerLifecycle`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/dokker.kt#L263:~:text=263-,interface%20DokkerLifecycle%20%7B,-275) interface:
+```kotlin
+myContainer.execWithSpacedParameter { "some-command" to "argument with spaces" }
+```
+
+You can also run any Docker command directly using the [`String.runCommand`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/DokkerContainer.kt) extension:
+
+```kotlin
+"docker ps".runCommand()
+```
+
+## DokkerNetwork
+
+[`DokkerNetwork`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/DokkerNetwork.kt) manages a Docker network. It requires the container runtime process name and the network name. Use `DokkerProcessName.processName` to pick up whichever process is configured (see [Podman support](#podman-support)):
+
+```kotlin
+val myNetwork = DokkerNetwork(DokkerProcessName.processName, "some-network").also { it.start() }
+```
+
+`DokkerNetwork` implements [`DokkerLifecycle`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/DokkerLifecycle.kt) and can be managed alongside containers.
+
+## DokkerLifecycle
+
+Both [`DokkerContainer`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/DokkerContainer.kt) and [`DokkerNetwork`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/DokkerNetwork.kt) implement the [`DokkerLifecycle`](https://github.com/corbym/dokker/blob/main/src/main/kotlin/io/github/corbym/dokker/DokkerLifecycle.kt) interface, which allows them to be managed together in sets:
 
 ```kotlin
 interface DokkerLifecycle {
@@ -138,64 +142,31 @@ interface DokkerLifecycle {
 }
 ```
 
-# Junit5 `DokkerProvider` Extension
-You can extend a test with the junit5 `@ExtendWith` annotation and create your own `DokkerProvider`.
+## JUnit 5 Integration
 
-See [ExampleDokkerProvider.kt](src/test/kotlin/io/github/corbym/junit5/ExampleDokkerProvider.kt) for more details.
+### DokkerProvider extension
 
-## Lifecycle
+You can implement `DokkerProvider` and use it with JUnit 5's `@ExtendWith` annotation. The container lifecycle is managed automatically:
 
-The docker container provider lifecycle is as follows:
+| Phase | Action |
+|---|---|
+| BeforeAll | Validate, run the container, execute startup commands |
+| JVM Shutdown | Tear down the container |
 
-BeforeAll:
+**Startup validation:** if a container with the same name exists but is stopped, Dokker will error rather than restart it — remove the container manually first. If the container is already running, Dokker leaves it alone and will not stop it on shutdown ("if it's not mine, don't touch it").
 
-1. Start up validation
-2. Run the container
-3. Start up execution
+See [ExampleDokkerProvider.kt](src/test/kotlin/io/github/corbym/junit5/ExampleDokkerProvider.kt) for a full example.
 
-JVM Shutdown:
+### DokkerExtension
 
-4. Tear down container
-
-## Start up validation
-
-If the container exists but is not running, the framework will not start it and error.
-In this case, you should remove the container manually.
-
-If the container with the same name is already running, the framework will not try to start the container, and will not try to
-stop it when the JVM exits.
-
-The principle being, "if its not mine, don't touch it."
-
-## Run the container
-
-The framework will attempt to run the container with `docker run`.
-
-## Start up execution
-
-After the container has been run, any executions you specify are performed. You can specify this with
-
-```kotlin
-onStartup { container, _ ->
-    it.waitForHealthCheck()
-}
-```
-## Tear down
-
-The containers are only torn down when the JVM executes a shutdown hook.
-
-If the container fails to start or was already running with the same container name, the framework will NOT run the shutdown hook, and leave the container up.
-
-# Junit5 `DokkerExtension` Extension
-
-The `DokkerExtension` class was created so that the Junit5 `@RegisterExtension` function can be taken advantage of, and is available from 0.2.0 onwards:
+`DokkerExtension` supports the JUnit 5 `@RegisterExtension` annotation. It starts the container in `BeforeAll` and stops and removes it in `AfterAll`:
 
 ```kotlin
 import io.github.corbym.dokker.junit5.DokkerExtension
 import io.github.corbym.dokker.junit5.dokkerExtension
-...
 import io.github.corbym.dokker.junit5.findFreePort
 import org.junit.jupiter.api.extension.RegisterExtension
+
 class ExampleJUnit5RegisteredDokkerTest {
     companion object {
         val couchbasePort = findFreePort()
@@ -213,33 +184,26 @@ class ExampleJUnit5RegisteredDokkerTest {
                     image { "arungupta/couchbase" }
                     version { "latest" }
                 }
-                doNotStop()
             }
+            doNotStop()
         }
     }
-... rest of test ...
-}
-```
-This extension starts the container on the `BeforeAll` lifecycle of the test, and will stop the container in the `AfterAll` phase. You can prevent shutdown and removal respectively by specifying `doNotStop()` and `doNotRemove` in the `dokkerExtension` builder.
-
-Note that a random available port was used by calling the utility function `io.github.corbym.dokker.junit5.findFreePort` in the above example. See [`ExampleJUnit5RegisteredDokkerTest`](src/test/kotlin/io/github/corbym/junit5/ExampleJUnit5RegisteredDokkerTest.kt) for more information.
-
-# Podman support (v0.4.0 onwards)
-
-Dokker now provides a way to specify which process is used under the hood.
-
-Either the process name can be set in code:
-```
-dokker {
-  process("specificProcessName") ...
+    // ... rest of test ...
 }
 ```
 
-Otherwise, it uses: 
-* environment variable (`DOKKER_PROCESS`)
-* hardcoded "docker"
-  
-# Contributing
-## How can I contribute to Dokker?
+`findFreePort()` is a utility function that returns a random available port as a `String`. You can prevent shutdown and removal by calling `doNotStop()` and `doNotRemove()` in the `dokkerExtension { }` builder.
 
-Please open an issue or fork and a PR for any changes you wish to be considered.
+See [`ExampleJUnit5RegisteredDokkerTest`](src/test/kotlin/io/github/corbym/junit5/ExampleJUnit5RegisteredDokkerTest.kt) for a full example.
+
+## Podman support
+
+Dokker supports alternative container runtimes such as Podman. The process used can be configured in three ways (in order of precedence):
+
+1. In code: `dokker { process("podman") }`
+2. Via the environment variable `DOKKER_PROCESS`
+3. Default: `docker`
+
+## Contributing
+
+Please open an issue or fork the repository and open a PR for any changes you wish to be considered.
