@@ -1,4 +1,5 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.corbym/dokker?color=4caf50&label=latest%20release)](https://maven-badges.herokuapp.com/maven-central/io.github.corbym/dokker)
+[![Build Status](https://github.com/corbym/dokker/actions/workflows/build-dokker-project.yml/badge.svg)](https://github.com/corbym/dokker/actions/workflows/build-dokker-project.yml)
 
 # dokker
 
